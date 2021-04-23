@@ -52,70 +52,74 @@ Arquivos e exemplos:
 __Estabelecimentos__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Estabelecimentos)
+[Dicionário de campos](./assets/docs/database/dictionary.md#estabelecimentos)
 
 </br>
 
 __Empresas__
 
 ![csv_empresas.jpg](./assets/images/cnpj/csv_empresas.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Empresas)
+[Dicionário de campos](./assets/docs/database/dictionary.md#empresas)
 
 </br>
 
 __Sócios__
 
 ![csv_socios.jpg](./assets/images/cnpj/csv_socios.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Sócios)
+[Dicionário de campos](./assets/docs/database/dictionary.md#sócios)
 
 </br>
 
 __CNAE - Classificação Nacional de Atividades Econômicas__
 
 ![csv_cnaes.jpg](./assets/images/cnpj/csv_cnaes.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#CNAE%-%Classificação%Nacional%de%Atividades%Econômicas)
+[Dicionário de campos](./assets/docs/database/dictionary.md#cnae---classificação-nacional-de-atividades-econômicas)
+
+_Órgão responsável por esta classificação:_ [concla](https://concla.ibge.gov.br)
 
 </br>
 
 __Natureza Jurídica__
 
 ![csv_naturezajuridica.jpg](./assets/images/cnpj/csv_naturezajuridica.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Natureza%Jurídica)
+[Dicionário de campos](./assets/docs/database/dictionary.md#natureza-jurídica)
+
+_Órgão responsável por esta classificação:_ [concla](https://concla.ibge.gov.br)
 
 </br>
 
 __Qualificação do Sócio__
 
 ![csv_qualificacao.jpg](./assets/images/cnpj/csv_qualificacao.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Qualificação%do%Sócio)
+[Dicionário de campos](./assets/docs/database/dictionary.md#qualificação-do-sócio)
 
 </br>
 
 __Código do Município__
 
 ![csv_municipio.jpg](./assets/images/cnpj/csv_municipio.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Código%do%Município)
+[Dicionário de campos](./assets/docs/database/dictionary.md#código-do-município)
 
 </br>
 
 __Código do País__
 
 ![csv_pais.jpg](./assets/images/cnpj/csv_pais.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Código%do%País)
+[Dicionário de campos](./assets/docs/database/dictionary.md#código-do-país)
 
 </br>
 
 __Dados do Simples Nacional__
 
 ![csv_simples.jpg](./assets/images/cnpj/csv_simples.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#Dados%do%Simples%Nacional)
+[Dicionário de campos](./assets/docs/database/dictionary.md#dados-do-simples-nacional)
 
 </br>
 
 
 __Notas__
 
-1. O campo 169 (CNPJ/CPF DO SÓCIO) e 271 (CNPJ/CPF DO REPRESENTANTE) do layout de sócios devem ser descaracterizados conforme a regra abaixo:
+1. O campo (CNPJ/CPF DO SÓCIO) e (CNPJ/CPF DO REPRESENTANTE) do layout de sócios devem ser descaracterizados conforme a regra abaixo:
 
 - Ocultação de informações pessoais sigilosas como no caso do CPF, o qual deve ser descaracterizado por meio da ocultação dos três primeiros dígitos e dos dois dígitos verificadores, conforme orientação disposta no art. 129 § 2o da Lei no 13.473/2017 (LDO
 2018).
@@ -124,7 +128,13 @@ __Notas__
 
 Deve ser preenchido para os casos de Órgãos e Entidades do grupo de Natureza Jurídica 1XX. Para as demais naturezas, esse atributo fica em branco.
 
-Exemplos de texto que deverão aparecer no arquivo final: UNIÃO; DISTRITO FEDERAL; BAHIA; para municípios, exibir também a sigla da UF: 
+Exemplos de texto que deverão aparecer no arquivo final: 
+
+- UNIÃO; 
+- DISTRITO FEDERAL; 
+- BAHIA; 
+
+para municípios, exibir também a sigla da UF: 
 
 - SÃO PAULO – SP;
 - BELO HORIZONTE – MG;
