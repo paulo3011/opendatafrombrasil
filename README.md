@@ -57,13 +57,99 @@ __Estabelecimentos__
 </br>
 
 __Empresas__
-![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_empresas.jpg)
+
+![csv_empresas.jpg](./assets/images/cnpj/csv_empresas.jpg)
 [Dicionário de campos](./assets/docs/database/dictionary.md#Empresas)
 
 </br>
+
+__Sócios__
+
+![csv_socios.jpg](./assets/images/cnpj/csv_socios.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Sócios)
+
+</br>
+
+__CNAE - Classificação Nacional de Atividades Econômicas__
+
+![csv_cnaes.jpg](./assets/images/cnpj/csv_cnaes.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#CNAE%-%Classificação%Nacional%de%Atividades%Econômicas)
+
+</br>
+
+__Natureza Jurídica__
+
+![csv_naturezajuridica.jpg](./assets/images/cnpj/csv_naturezajuridica.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Natureza%Jurídica)
+
+</br>
+
+__Qualificação do Sócio__
+
+![csv_qualificacao.jpg](./assets/images/cnpj/csv_qualificacao.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Qualificação%do%Sócio)
+
+</br>
+
+__Código do Município__
+
+![csv_municipio.jpg](./assets/images/cnpj/csv_municipio.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Código%do%Município)
+
+</br>
+
+__Código do País__
+
+![csv_pais.jpg](./assets/images/cnpj/csv_pais.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Código%do%País)
+
+</br>
+
+__Dados do Simples Nacional__
+
+![csv_simples.jpg](./assets/images/cnpj/csv_simples.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Dados%do%Simples%Nacional)
+
 </br>
 
 
+__Notas__
+
+1. O campo 169 (CNPJ/CPF DO SÓCIO) e 271 (CNPJ/CPF DO REPRESENTANTE) do layout de sócios devem ser descaracterizados conforme a regra abaixo:
+
+- Ocultação de informações pessoais sigilosas como no caso do CPF, o qual deve ser descaracterizado por meio da ocultação dos três primeiros dígitos e dos dois dígitos verificadores, conforme orientação disposta no art. 129 § 2o da Lei no 13.473/2017 (LDO
+2018).
+
+2. Campo Ente Federativo Responsável – EFR, no Layout Principal (Dados Cadastrais): 
+
+Deve ser preenchido para os casos de Órgãos e Entidades do grupo de Natureza Jurídica 1XX. Para as demais naturezas, esse atributo fica em branco.
+
+Exemplos de texto que deverão aparecer no arquivo final: UNIÃO; DISTRITO FEDERAL; BAHIA; para municípios, exibir também a sigla da UF: 
+
+- SÃO PAULO – SP;
+- BELO HORIZONTE – MG;
+
+3. Campo Faixa Etária, no Layout Sócios
+
+Baseada na data de nascimento do CPF de cada sócio, deverá ser criado o valor para o campo Faixa Etária conforme a regra abaixo:
+
+- 1 para os intervalos entre 0 a 12 anos;
+- 2 para os intervalos entre 13 a 20 anos;
+- 3 para os intervalos entre 21 a 30 anos;
+- 4 para os intervalos entre 31 a 40 anos;
+- 5 para os intervalos entre 41 a 50 anos;
+- 6 para os intervalos entre 51 a 60 anos;
+- 7 para os intervalos entre 61 a 70 anos;
+- 8 para os intervalos entre 71 a 80 anos; 
+- 9 para maiores de 80 anos;
+- 0 para não se aplica;
+
+4. O Campo CNAE FISCAL SECUNDÁRIA, no Layout Estabelecimentos:
+
+Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os casos de várias ocorrências.
+
+
+</br>
 
 # Referências técnicas
 
