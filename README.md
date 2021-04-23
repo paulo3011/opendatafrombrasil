@@ -71,3 +71,4 @@ __Empresas__
 - https://github.com/tiimgreen/github-cheat-sheet/blob/master/README.md
 - https://udacity.github.io/git-styleguide/
 - https://shields.io/
+- https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
