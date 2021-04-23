@@ -158,8 +158,22 @@ Baseada na data de nascimento do CPF de cada sócio, deverá ser criado o valor 
 
 Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os casos de várias ocorrências.
 
-
 </br>
+
+
+# Melhorias futuras
+
+## Inclusão de novos conjuntos de dados
+
+__CNAE - Estrutura detalhada e notas explicativas__
+
+Descreve de forma mais detalhada quais atividades estão enquadradas ou não em cada CNAE. Este dataset pode ser usado para localizar de forma mais precisa as empresas pelas atividades que ela pode ou não exercer. 
+
+Observa-se no PDF um padrão na forma de descrever o quais atividades estão ou não incluídas em cada código o que permite extração de forma programática.	
+
+https://concla.ibge.gov.br/images/concla/downloads/revisao2007/PropCNAE20/CNAE20_NotasExplicativas.pdf
+
+
 
 # Referências técnicas
 
@@ -168,3 +182,4 @@ Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os ca
 - https://udacity.github.io/git-styleguide/
 - https://shields.io/
 - https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
+- https://github.com/georgevbsantiago/qsacnpj/
