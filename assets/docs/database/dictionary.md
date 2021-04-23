@@ -8,7 +8,7 @@
 | CNPJ DV                     | DÍGITO VERIFICADOR DO NÚMERO DE INSCRIÇÃO NO CNPJ (DOIS ÚLTIMOS DÍGITOS DO CNPJ).                  |
 | IDENTIFICADOR MATRIZ/FILIAL | CÓDIGO DO IDENTIFICADOR MATRIZ/FILIAL:</br> 1 – MATRIZ</br>2 – FILIAL                                    |
 | NOME FANTASIA               | CORRESPONDE AO NOME FANTASIA                                                                       |
-| SITUAÇÃO CADASTRAL          | CÓDIGO DA SITUAÇÃO CADASTRAL: 01 – NULA</br>2 – ATIVA</br>3 – SUSPENSA</br>4 – INAPTA</br>08 – BAIXADA |
+| SITUAÇÃO CADASTRAL          | CÓDIGO DA SITUAÇÃO CADASTRAL:</br>01 – NULA</br>2 – ATIVA</br>3 – SUSPENSA</br>4 – INAPTA</br>08 – BAIXADA |
 | DATA SITUAÇÃO CADASTRAL     | DATA DO EVENTO DA SITUAÇÃO CADASTRAL                                                               |
 | MOTIVO SITUAÇÃO CADASTRAL   | CÓDIGO DO MOTIVO DA SITUAÇÃO CADASTRAL                                                             |
 | NOME DA CIDADE NO EXTERIOR  | NOME DA CIDADE NO EXTERIOR                                                                         |
@@ -43,9 +43,9 @@
 | CNPJ BÁSICO                 | NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).                                 |
 | CNPJ ORDEM                  | NÚMERO DO ESTABELECIMENTO DE INSCRIÇÃO NO CNPJ (DO NONO ATÉ O DÉCIMO SEGUNDO DÍGITO DO CNPJ).      |
 | CNPJ DV                     | DÍGITO VERIFICADOR DO NÚMERO DE INSCRIÇÃO NO CNPJ (DOIS ÚLTIMOS DÍGITOS DO CNPJ).                  |
-| IDENTIFICADOR MATRIZ/FILIAL | CÓDIGO DO IDENTIFICADOR MATRIZ/FILIAL: 1 – MATRIZ</br>2 – FILIAL                                    |
+| IDENTIFICADOR MATRIZ/FILIAL | CÓDIGO DO IDENTIFICADOR MATRIZ/FILIAL:</br>1 – MATRIZ</br>2 – FILIAL                                    |
 | NOME FANTASIA               | CORRESPONDE AO NOME FANTASIA                                                                       |
-| SITUAÇÃO CADASTRAL          | CÓDIGO DA SITUAÇÃO CADASTRAL: 01 – NULA</br>2 – ATIVA</br>3 – SUSPENSA</br>4 – INAPTA</br>08 – BAIXADA |
+| SITUAÇÃO CADASTRAL          | CÓDIGO DA SITUAÇÃO CADASTRAL:</br>01 – NULA</br>2 – ATIVA</br>3 – SUSPENSA</br>4 – INAPTA</br>08 – BAIXADA |
 | DATA SITUAÇÃO CADASTRAL     | DATA DO EVENTO DA SITUAÇÃO CADASTRAL                                                               |
 | MOTIVO SITUAÇÃO CADASTRAL   | CÓDIGO DO MOTIVO DA SITUAÇÃO CADASTRAL                                                             |
 | NOME DA CIDADE NO EXTERIOR  | NOME DA CIDADE NO EXTERIOR                                                                         |
