@@ -31,20 +31,34 @@ Este projeto tem como objetivo final permitir que as pessoas possam fazer análi
 - Quem são meus clientes, quais empresas eles possuem, existe alguma informação de contato disponível?
 - Faço alguma abordagem diferenciada para alguns clientes em função de existir clientes se relacionando entre si?
 
-### __Conjutos de dados__
+### __Descrição dos conjuntos de dados__
 
 Os conjutos de dados utilizados inicialmente são oriundos do governo brasileiro e disponibilizados de forma aberta.
 
 __Dados Abertos do CNPJ__
 
 
-**Característica**|**Descrição**|**Online**
+**Característica**|**Descrição**|**Status**
 -----|:-----:|:-----:
 Periodicidade atualização:|mensal
 Formato dados:|csv
 Origem:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/dados-publicos-cnpj)|![Website](https://img.shields.io/website?url=http%3A%2F%2F200.152.38.155%2FCNPJ%2F)
 Layout:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf)
 
+</br>
+
+Arquivos e exemplos:
+
+__Estabelecimentos__
+
+![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#__Estabelecimentos__)
+
+</br>
+
+__Empresas__
+![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_empresas.jpg)
+[Dicionário de campos](./assets/docs/database/dictionary.md#__Empresas__)
 
 </br>
 </br>
@@ -56,3 +70,4 @@ Layout:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientaca
 - https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.md
 - https://github.com/tiimgreen/github-cheat-sheet/blob/master/README.md
 - https://udacity.github.io/git-styleguide/
+- https://shields.io/
