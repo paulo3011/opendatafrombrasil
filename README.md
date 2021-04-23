@@ -52,13 +52,13 @@ Arquivos e exemplos:
 __Estabelecimentos__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#__Estabelecimentos__)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Estabelecimentos)
 
 </br>
 
 __Empresas__
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_empresas.jpg)
-[Dicionário de campos](./assets/docs/database/dictionary.md#__Empresas__)
+[Dicionário de campos](./assets/docs/database/dictionary.md#Empresas)
 
 </br>
 </br>
