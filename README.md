@@ -161,9 +161,36 @@ Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os ca
 </br>
 
 
+__Dados complementares IBGE__
+
+__Códigos municípios segundo IBGE__
+
+Fonte: ftp://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2020/DTB_2020_v2.zip
+Disponibilizado em: https://www.ibge.gov.br/explica/codigos-dos-municipios.php
+
 # Melhorias futuras
 
 ## Inclusão de novos conjuntos de dados
+
+__Dados populacionais__
+
+Coletar dados relacionados a população brasileira para subsidiar análises relacionadas a abertura de empresas ou detecção de oportunidades.
+
+__Inforamções relacionadas a valores de terrenos e imóveis__
+
+Coletar dados relacionados a preço de compra e venda de imóveis e terrenos para que seja possível subsidiar análises relacionadas a abertura de empresas, detecção de oportunidades e concorrência.
+
+__Reclamações relacionadas as empresas__
+
+Coletar dados relacionados a reclamações abertas ou relatadas por clientes em sites como reclameaqui, procon para pode analisar as empresas por esta perspectiva. Pode medir o nível de satisfação dos clientes.
+
+__Informações climáticas__
+
+Coletar informações relacionadas a temperatura e clima para subisidiar análises de abertura de empresa, detecção de oportunidades e riscos.
+
+__Dados relacionados a força de trabalho disponível__
+
+Dados sobre nível de escolaridade e educacional.
 
 __CNAE - Estrutura detalhada e notas explicativas__
 
@@ -183,3 +210,4 @@ https://concla.ibge.gov.br/images/concla/downloads/revisao2007/PropCNAE20/CNAE20
 - https://shields.io/
 - https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
 - https://github.com/georgevbsantiago/qsacnpj/
+- https://www.kaggle.com/hugomathien/soccer/home
