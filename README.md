@@ -117,6 +117,10 @@ __Dados do Simples Nacional__
 </br>
 
 
+__Motivo Situação Cadastral__
+
+https://receita.economia.gov.br/orientacao/tributaria/cadastros/cadastro-nacional-de-pessoas-juridicas-cnpj/DominiosMotivoSituaoCadastral.csv/view
+
 __Notas__
 
 1. O campo (CNPJ/CPF DO SÓCIO) e (CNPJ/CPF DO REPRESENTANTE) do layout de sócios devem ser descaracterizados conforme a regra abaixo:

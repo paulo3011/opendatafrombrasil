@@ -9,11 +9,11 @@
 | IDENTIFICADOR MATRIZ/FILIAL | CÓDIGO DO IDENTIFICADOR MATRIZ/FILIAL:</br> 1 – MATRIZ</br>2 – FILIAL                                    |
 | NOME FANTASIA               | CORRESPONDE AO NOME FANTASIA                                                                       |
 | SITUAÇÃO CADASTRAL          | CÓDIGO DA SITUAÇÃO CADASTRAL:</br>01 – NULA</br>2 – ATIVA</br>3 – SUSPENSA</br>4 – INAPTA</br>08 – BAIXADA |
-| DATA SITUAÇÃO CADASTRAL     | DATA DO EVENTO DA SITUAÇÃO CADASTRAL                                                               |
+| DATA SITUAÇÃO CADASTRAL     | DATA DO EVENTO DA SITUAÇÃO CADASTRAL (YYYYMMDD)                                                               |
 | MOTIVO SITUAÇÃO CADASTRAL   | CÓDIGO DO MOTIVO DA SITUAÇÃO CADASTRAL                                                             |
 | NOME DA CIDADE NO EXTERIOR  | NOME DA CIDADE NO EXTERIOR                                                                         |
 | PAIS                        | CÓDIGO DO PAIS                                                                                     |
-| DATA DE INÍCIO ATIVIDADE    | DATA DE INÍCIO DA ATIVIDADE                                                                        |
+| DATA DE INÍCIO ATIVIDADE    | DATA DE INÍCIO DA ATIVIDADE   (YYYYMMDD)                                                                     |
 | CNAE FISCAL PRINCIPAL       | CÓDIGO DA ATIVIDADE ECONÔMICA PRINCIPAL DO ESTABELECIMENTO                                         |
 | CNAE FISCAL SECUNDÁRIA      | CÓDIGO DA(S) ATIVIDADE(S) ECONÔMICA(S) SECUNDÁRIA(S) DO ESTABELECIMENTO                            |
 | TIPO DE LOGRADOURO          | DESCRIÇÃO DO TIPO DE LOGRADOURO                                                                    |
@@ -23,7 +23,7 @@
 | BAIRRO                      | BAIRRO ONDE SE LOCALIZA O ESTABELECIMENTO.                                                         |
 | CEP                         | CÓDIGO DE ENDEREÇAMENTO POSTAL REFERENTE AO LOGRADOURO NO QUAL O ESTABELECIMENTO ESTA LOCALIZADO   |
 | UF                          | SIGLA DA UNIDADE DA FEDERAÇÃO EM QUE SE ENCONTRA O ESTABELECIMENTO                                 |
-| MUNICÍPIO                   | CÓDIGO DO MUNICÍPIO DE JURISDIÇÃO ONDE SE ENCONTRA O ESTABELECIMENTO                               |
+| MUNICÍPIO                   | CÓDIGO DO MUNICÍPIO DE JURISDIÇÃO ONDE SE ENCONTRA O ESTABELECIMENTO (NÃO É O CÓDIGO DO IBGE)                              |
 | DDD 1                       | CONTÉM O DDD 1                                                                                     |
 | TELEFONE 1                  | CONTÉM O NÚMERO DO TELEFONE 1                                                                      |
 | DDD 2                       | CONTÉM O DDD 2                                                                                     |
