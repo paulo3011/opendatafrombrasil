@@ -11,4 +11,11 @@ from pyspark.sql.types import (
 
 # company source schema
 company_raw_schema = StructType()
+company_raw_schema.add("basic_cnpj", StringType(), False)
 company_raw_schema.add("legal_name", StringType(), True)
+company_raw_schema.add("nature_legal", StringType(), True)
+company_raw_schema.add("responsible_qualification", StringType(), True)
+company_raw_schema.add("company_capital", StringType(), True)
+company_raw_schema.add("company_size", StringType(), True)
+# FEDERATIVE ENTITY RESPONSIBLE
+company_raw_schema.add("federative_entity_responsible", StringType(), True)
