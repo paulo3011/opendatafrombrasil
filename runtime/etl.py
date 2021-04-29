@@ -21,6 +21,7 @@ conf = SparkConf() \
        .set("spark.sql.adaptive.enabled", "true") \
        .set("spark.sql.adaptive.coalescePartitions.enabled", "true") \
        .set("spark.sql.adaptive.skewJoin.enabled", "true") \
+       .set("spark.sql.legacy.timeParserPolicy", "CORRECTED") \
        .setMaster("local[*]")
 
 def create_spark_session():
@@ -39,14 +40,14 @@ def create_spark_session():
 
 # tasks
 
-def _process_establishments_to_parquet(df, output_path="/home/paulo/tmp/establishments/all/parquet/", compression = "snappy"):
+def _process_establishments_to_parquet(df, output_path="/home/paulo/tmp/establishments/20210429/all/parquet/", compression = "snappy"):
     df.write.parquet(
         path=output_path,
         # partitionBy=["year", "artist_id"],
         compression=compression,
         mode="overwrite")      
 
-def _process_establishments_to_orc(df, output_path="/home/paulo/tmp/establishments/all/orc/", compression = "snappy"):
+def _process_establishments_to_orc(df, output_path="/home/paulo/tmp/establishments/20210429/all/orc/", compression = "snappy"):
     """
     Notes:
     - Redshift COPY inserts values into the target table's columns in the same order as the columns occur in the columnar data files. The number of columns in the target table and the number of columns in the data file must match.
@@ -59,7 +60,7 @@ def _process_establishments_to_orc(df, output_path="/home/paulo/tmp/establishmen
         compression=compression,
         mode="overwrite")     
 
-def _process_establishments_to_avro(df, output_path="/home/paulo/tmp/establishments/all/avro/", compression = "snappy"):
+def _process_establishments_to_avro(df, output_path="/home/paulo/tmp/establishments/20210429/all/avro/", compression = "snappy"):
     """
     seealso: 
     - https://spark.apache.org/docs/latest/sql-data-sources-avro.html
@@ -71,22 +72,44 @@ def _process_establishments_to_avro(df, output_path="/home/paulo/tmp/establishme
 
 def process_establishments(spark, output_path="/home/paulo/tmp/establishments/", compression = "snappy"):
     print("starting process_establishments")
-    # file:/home/paulo/projects/paulo3011/opendatafrombrasil/~/tmp/K3241.K03200Y0.D10410.ESTABELE
-    path = "/home/paulo/tmp/2021-04-14/estabelecimento/"
+    path = "/home/paulo/tmp/2021-04-14/estabelecimento/" # all files
+    # path = "/home/paulo/tmp/2021-04-14/estabelecimento/K3241.K03200Y0.D10410.ESTABELE"
     # http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameReader.csv.html#pyspark.sql.DataFrameReader.csv
+    # https://spark.apache.org/docs/3.1.1/sql-ref-datetime-pattern.html
     establishments_raw_df = spark.read.csv(
         path=path, 
         schema=establishments_raw_schema, 
         sep=";", 
         encoding="ISO-8859-1", 
+        dateFormat="yyyyMMdd",
         enforceSchema=False)
 
-    print(establishments_raw_df.show(1))
+    # print(establishments_raw_df.where("basic_cnpj=36451356").select(["basic_cnpj", "activity_start_date"]).show())
+    print(establishments_raw_df.where("basic_cnpj=36451356").head())
+    # print(establishments_raw_df.show(1))
 
-    _process_establishments_to_parquet(establishments_raw_df) 
+    # _process_establishments_to_parquet(establishments_raw_df) 
     _process_establishments_to_orc(establishments_raw_df) 
-    _process_establishments_to_avro(establishments_raw_df) 
+    # _process_establishments_to_avro(establishments_raw_df) 
     
+
+def test_parse_date(spark):
+    from pyspark.sql.functions import to_date, col
+    from pyspark.sql.types import StructType, DateType, StringType
+    df=spark.createDataFrame([["20200221"],["20210318"]],["start"])
+    df.select(col("start"),to_date(col("start"),"yyyyMMdd").alias("date")).show()    
+    
+    path = "/home/paulo/projects/paulo3011/opendatafrombrasil/assets/sample/custom_date.csv"
+    schema = StructType()
+    schema.add("date", DateType(), False)
+    df2 = spark.read.csv(
+        path=path, 
+        schema=schema, 
+        sep=";", 
+        encoding="ISO-8859-1", 
+        dateFormat="yyyyMMdd",
+        enforceSchema=False)  
+    df2.show()  
 
 def main():
     spark = create_spark_session()
@@ -95,5 +118,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-print("ok")

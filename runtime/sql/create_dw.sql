@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS stage_establishment
 	,cnpj_checking_digit VARCHAR(10)
 	,matrix_branch SMALLINT
 	,fantasy_name VARCHAR(300)
-	,legal_name VARCHAR(300)
+	,registration_situation SMALLINT
 	,date_registration_situation DATE 
 	,reason_registration_situation SMALLINT
 	,name_city_abroad VARCHAR(300) 
