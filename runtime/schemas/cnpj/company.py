@@ -13,7 +13,7 @@ from pyspark.sql.types import (
 company_raw_schema = StructType()
 company_raw_schema.add("basic_cnpj", StringType(), False)
 company_raw_schema.add("legal_name", StringType(), True)
-company_raw_schema.add("nature_legal", StringType(), True)
+company_raw_schema.add("legal_nature", StringType(), True)
 company_raw_schema.add("responsible_qualification", StringType(), True)
 company_raw_schema.add("company_capital", StringType(), True)
 company_raw_schema.add("company_size", StringType(), True)
