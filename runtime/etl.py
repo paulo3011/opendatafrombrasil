@@ -85,12 +85,10 @@ def process_establishments(spark, output_path="/home/paulo/tmp/establishments/",
         enforceSchema=False)
 
     # print(establishments_raw_df.where("basic_cnpj=36451356").select(["basic_cnpj", "activity_start_date"]).show())
-    print(establishments_raw_df.where("basic_cnpj=36451356").head())
+    # print(establishments_raw_df.where("basic_cnpj=36451356").head())
     # print(establishments_raw_df.show(1))
 
-    # _process_establishments_to_parquet(establishments_raw_df) 
     _process_establishments_to_orc(establishments_raw_df) 
-    # _process_establishments_to_avro(establishments_raw_df) 
     
 
 def test_parse_date(spark):
