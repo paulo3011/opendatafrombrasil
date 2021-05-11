@@ -215,3 +215,4 @@ https://concla.ibge.gov.br/images/concla/downloads/revisao2007/PropCNAE20/CNAE20
 - https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
 - https://github.com/georgevbsantiago/qsacnpj/
 - https://www.kaggle.com/hugomathien/soccer/home
+- https://www.w3schools.com/python/python_intro.asp
