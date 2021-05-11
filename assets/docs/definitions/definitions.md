@@ -29,3 +29,15 @@ Seealso:
 - https://spark.apache.org/docs/3.1.1/sql-ref-datetime-pattern.html
 - http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameReader.csv.html#pyspark.sql.DataFrameReader.csv
 - https://spark.apache.org/docs/latest/sql-ref-datatypes.html
+
+
+2. How to process company capital value (e.g. 000000018000,00)
+
+```shell
+Row(basic_cnpj='13846071', legal_name='CESAR APARECIDO NICOLETI', legal_nature='2135', responsible_qualification='50', company_capital='000000018000,00', company_size='01', federative_entity_responsible=None)
++----------+--------------------+------------+-------------------------+---------------+------------+-----------------------------+
+|basic_cnpj|          legal_name|legal_nature|responsible_qualification|company_capital|company_size|federative_entity_responsible|
++----------+--------------------+------------+-------------------------+---------------+------------+-----------------------------+
+|  13846071|CESAR APARECIDO N...|        2135|                       50|000000018000,00|          01|                         null|
++----------+--------------------+------------+-------------------------+---------------+------------+-----------------------------+
+```

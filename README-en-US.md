@@ -5,7 +5,7 @@ Leia em outro idioma (Read this in other language):
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README-en-US.md)
 [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](README.md)
 
-This project was made to explore the Brasil open data about companys.
+This project was made to explore the Brazil open data about companies.
 
 
 # References

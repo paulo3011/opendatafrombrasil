@@ -3,8 +3,16 @@ CREATE SCHEMA IF NOT EXISTS open_data;
 -- select dw schema as default
 SET search_path TO open_data;
 
--- Establishment
+
 DROP TABLE IF EXISTS stage_establishment;
+DROP TABLE IF EXISTS stage_company;
+DROP TABLE IF EXISTS stage_partner;
+DROP TABLE IF EXISTS stage_simple_national;
+DROP TABLE IF EXISTS stage_city_code;
+DROP TABLE IF EXISTS stage_cnae;
+DROP TABLE IF EXISTS stage_country_code;
+DROP TABLE IF EXISTS stage_legal_nature;
+DROP TABLE IF EXISTS stage_partner_qualification;
 
 CREATE TABLE IF NOT EXISTS stage_establishment
 (
@@ -38,4 +46,71 @@ CREATE TABLE IF NOT EXISTS stage_establishment
 	,contributors_email VARCHAR(300)
 	,special_situation VARCHAR(300)
 	,special_situation_date DATE
+);
+
+CREATE TABLE IF NOT EXISTS stage_company
+(
+	basic_cnpj VARCHAR(10)
+	,legal_name VARCHAR(300)
+	,legal_nature VARCHAR(300)
+	,responsible_qualification VARCHAR(300)
+	,company_capital VARCHAR(300)
+	,company_size VARCHAR(300)
+	,federative_entity_responsible VARCHAR(300)	
+);
+
+CREATE TABLE IF NOT EXISTS stage_partner
+(
+	basic_cnpj VARCHAR(300)
+	,partner_type VARCHAR(300)
+	,partner_name VARCHAR(300)
+	,partner_document VARCHAR(300)
+	,partner_qualification VARCHAR(300)
+	,partner_start_date VARCHAR(300)
+	,country VARCHAR(300)
+	,legal_representative VARCHAR(300)
+	,representative_name VARCHAR(300)
+	,representative_qualification VARCHAR(300)
+	,age_range VARCHAR(300)	
+);
+
+CREATE TABLE IF NOT EXISTS stage_simple_national
+(
+	basic_cnpj VARCHAR(300)
+	,is_simple VARCHAR(300)
+	,simple_option_date DATE
+	,simple_exclusion_date DATE
+	,is_mei VARCHAR(300)
+	,mei_option_date DATE
+	,mei_exclusion_date DATE	
+);
+
+CREATE TABLE IF NOT EXISTS stage_city_code
+(
+	code varchar(60)
+	,description varchar(300)
+);
+
+CREATE TABLE IF NOT EXISTS stage_cnae
+(
+	code varchar(60)
+	,description varchar(300)
+);
+
+CREATE TABLE IF NOT EXISTS stage_country_code
+(
+	code varchar(60)
+	,description varchar(300)
+);
+
+CREATE TABLE IF NOT EXISTS stage_legal_nature
+(
+	code varchar(60)
+	,description varchar(300)
+);
+
+CREATE TABLE IF NOT EXISTS stage_partner_qualification
+(
+	code varchar(60)
+	,description varchar(300)
 );
