@@ -69,11 +69,20 @@ def _write_to_csv(df, output_path, mode="overwrite"):
 
 
 def describe_dataframe(df, source_path, output_path):
+    df = df.cache()
     print("will describe: " + source_path)
     print(df.head())
     print(df.show(1))
 
+    broken_rows = df.where("broken is not null").select("broken")
+    print(broken_rows.show(1))    
+    total_broken = broken_rows.count()
+    print("descrebin broken rows:", total_broken)  
+    if total_broken > 0:
+        print("there was broken rows")
+
     for col in df.columns:
+        # todo: check if string to len
         df = df.withColumn(col + "_len", length(col))
 
     describe_df = df.describe()
@@ -94,7 +103,8 @@ def describe_cnpj_file(spark, source_path, schema, base_output_path, destination
         sep=";", 
         encoding="ISO-8859-1", 
         dateFormat="yyyyMMdd",
-        enforceSchema=False)        
+        enforceSchema=True,
+        columnNameOfCorruptRecord='broken')        
 
     output_path = base_output_path + destination_key
 

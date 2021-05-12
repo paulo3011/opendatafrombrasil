@@ -12,3 +12,4 @@ from pyspark.sql.types import (
 partner_qualification_raw_schema = StructType()
 partner_qualification_raw_schema.add("code", StringType(), False)
 partner_qualification_raw_schema.add("description", StringType(), True)
+partner_qualification_raw_schema.add("broken", StringType(), True)

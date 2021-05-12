@@ -51,6 +51,7 @@ establishments_raw_schema.add("contributors_email", StringType(), True)
 establishments_raw_schema.add("special_situation", StringType(), True)
 # YYYYMMDD
 establishments_raw_schema.add("special_situation_date", DateType(), True)
+establishments_raw_schema.add("broken", StringType(), True)
 
 # company
 # establishments_raw_schema.add("legal_name", StringType(), True)

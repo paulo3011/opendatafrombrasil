@@ -12,3 +12,4 @@ from pyspark.sql.types import (
 cnae_raw_schema = StructType()
 cnae_raw_schema.add("code", StringType(), False)
 cnae_raw_schema.add("description", StringType(), True)
+cnae_raw_schema.add("broken", StringType(), True)

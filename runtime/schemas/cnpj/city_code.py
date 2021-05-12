@@ -12,3 +12,4 @@ from pyspark.sql.types import (
 city_code_raw_schema = StructType()
 city_code_raw_schema.add("code", StringType(), False)
 city_code_raw_schema.add("description", StringType(), True)
+city_code_raw_schema.add("broken", StringType(), True)

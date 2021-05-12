@@ -19,3 +19,4 @@ company_raw_schema.add("company_capital", StringType(), True)
 company_raw_schema.add("company_size", StringType(), True)
 # FEDERATIVE ENTITY RESPONSIBLE
 company_raw_schema.add("federative_entity_responsible", StringType(), True)
+company_raw_schema.add("broken", StringType(), True)
