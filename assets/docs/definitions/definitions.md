@@ -42,6 +42,13 @@ Caused by: java.time.format.DateTimeParseException: Text '00000000' could not be
         at org.apache.spark.sql.catalyst.util.Iso8601DateFormatter.$anonfun$parse$1(DateFormatter.scala:59)
 ```
 
+TODO:
+```shell
+# create a small df to try parse a small csv
+spark.sql("set spark.sql.legacy.timeParserPolicy=LEGACY")
+df = spark.createDataFrame([('Fri May 24 00:00:00 BST 2019',)], ['mydate'])
+```
+
 3. How to process company capital value (e.g. 000000018000,00)
 
 ```shell

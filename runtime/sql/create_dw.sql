@@ -1,6 +1,6 @@
--- Create a new schema on redshift called dw
+-- Create a new schema on redshift
 CREATE SCHEMA IF NOT EXISTS open_data;
--- select dw schema as default
+-- select schema as default
 SET search_path TO open_data;
 
 
