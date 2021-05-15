@@ -3,7 +3,10 @@
 ## On spark-submit
 
 ```shell script
+# default params
 spark-submit --class application.batch.App opendata_etl-1.0.jar
+# custom params
+spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=paulo,spark.driver.cores=1
 ```
 ## On cmd
 

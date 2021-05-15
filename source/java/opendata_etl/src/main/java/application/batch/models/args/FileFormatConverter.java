@@ -1,4 +1,4 @@
-package application.batch.models;
+package application.batch.models.args;
 
 import application.batch.enums.FileFormat;
 import com.beust.jcommander.IStringConverter;
