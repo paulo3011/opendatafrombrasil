@@ -14,6 +14,30 @@ spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spa
 java -jar opendata_etl-1.0.jar
 ```
 
+# Erros conhecidos
+
+## NativeIO$Windows.access0(Ljava/lang/String;I)Z
+
+Em ambiente windows pode acontecer o erro abaixo:
+
+```shell script
+java.lang.UnsatisfiedLinkError: org.apache.hadoop.io.nativeio.NativeIO$Windows.access0(Ljava/lang/String;I)Z
+```
+Verifique se foi feito download dos arquivos do Hadoop na versão correta e se as variáveis de ambiente necessárias foram criadas.
+
+1. Baixar winutils
+```shell script
+git clone https://github.com/steveloughran/winutils.git
+cd winutils
+cp hadoop-3.0.0 C:/hadoop 
+```
+2. Configurar variáveis de ambiente:
+
+```shell script
+set HADOOP_HOME=c:/hadoop
+set PATH=%PATH%;%HADOOP_HOME%/bin;
+``` 
+
 # References
 
 - https://www.atlassian.com/git/tutorials/saving-changes/gitignore
