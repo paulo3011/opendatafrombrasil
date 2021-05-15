@@ -7,10 +7,10 @@ import java.util.Properties;
 public class SparkConfConverter implements IStringConverter<Properties> {
     @Override
     public Properties convert(String value) {
-        return parseFromString(value);
+        return convertFromString(value);
     }
 
-    public static Properties parseFromString(String values)
+    public static Properties convertFromString(String values)
     {
         if(values == null || values.isEmpty())
             return null;
