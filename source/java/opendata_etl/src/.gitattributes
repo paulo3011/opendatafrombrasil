@@ -1,0 +1,23 @@
+# seealso: https://www.jetbrains.com/help/idea/configuring-line-endings-and-line-separators.html
+# seealso: https://docs.github.com/pt/github/getting-started-with-github/configuring-git-to-handle-line-endings
+# Defina o comportamento padrão, caso as pessoas não tenham configurado o core.autocrlf.
+* text=auto
+
+# Declare explicitamente os arquivos de texto que você deseja que sempre sejam normalizados e convertidos
+# em delimitadores de linha nativos ao fazer checkout.
+# *.c text
+# *.h text
+
+# Declara que todos os arquivos sempre terão delimitadores de linha LF ao fazer checkout.
+* text eol=lf
+
+# Declare os arquivos que sempre terão delimitadores de linha CRLF ao fazer checkout.
+# *.sln text eol=crlf
+
+# Indique todos os arquivos que são verdadeiramente binários e que não devem ser modificados.
+*.png binary
+*.jpg binary
+*.dll binary
+*.exe binary
+*.jar binary
+*.bat binary
