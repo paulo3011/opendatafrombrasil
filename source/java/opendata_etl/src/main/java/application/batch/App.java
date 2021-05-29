@@ -1,12 +1,16 @@
 package application.batch;
 
+import application.batch.contracts.IPipeline;
+import application.batch.enums.FileType;
 import application.batch.models.args.Parameters;
 import application.batch.pipeline.CnpjRaw;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
+import java.io.IOException;
+
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("Starting app program..");
         Parameters parameters = new Parameters(args);
 
@@ -34,8 +38,12 @@ public class App {
                 .config(sparkConf)
                 .getOrCreate();
 
-        CnpjRaw pipeline = new CnpjRaw();
-        pipeline.Start(sparkSession, parameters);
+        IPipeline pipeline = null;
+        if(parameters.getInputFileType() == FileType.cnpj_raw)
+            pipeline = new CnpjRaw();
+
+        if(pipeline != null)
+            pipeline.Start(sparkSession, parameters);
 
         System.out.println("=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> >>>>>>>>>>>>>>>>>> >>>>>>>>>");
         System.out.println("Ended SparkSession..");
