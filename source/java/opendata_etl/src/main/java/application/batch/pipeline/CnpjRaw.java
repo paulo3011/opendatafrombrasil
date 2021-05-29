@@ -3,17 +3,11 @@ package application.batch.pipeline;
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.models.args.Parameters;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -44,28 +38,6 @@ public class CnpjRaw implements IPipeline {
         Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER);
 
     }
-
-    private void OrganizeData(Parameters parameters) throws IOException {
-        //FileUtils.iterateFiles()
-        File dirFile = new File(parameters.getInputPath());
-        if (!dirFile.exists() || dirFile.isFile())
-            return;
-
-        //* @see org.apache.commons.io.filefilter.FileFilterUtils
-        //* @see org.apache.commons.io.filefilter.NameFileFilter
-
-        // simple national
-        //FileFilterUtils.prefixFileFilter(simpleNationalFilenamePattern, IOCase.INSENSITIVE);
-        File simple_national_dir = new File(parameters.getInputPath() + SIMPLE_NATIONAL_FOLDER);
-        FileFilter fileFilter = new WildcardFileFilter(SIMPLE_NATIONAL_RAW_GLOB, IOCase.INSENSITIVE);
-        File[] files = dirFile.listFiles(fileFilter);
-
-        for (File file : files) {
-            File destinationFile = new File(simple_national_dir + file.getName());
-            FileUtils.moveFile(file, destinationFile);
-        }
-    }
-
 
     /**
      * Create and returns one dataframe for reading the data.
