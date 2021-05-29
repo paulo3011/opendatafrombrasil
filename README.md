@@ -31,6 +31,8 @@ Este projeto tem como objetivo final permitir que as pessoas possam fazer análi
 - Quem são meus clientes, quais empresas eles possuem, existe alguma informação de contato disponível?
 - Faço alguma abordagem diferenciada para alguns clientes em função de existir clientes se relacionando entre si?
 
+## 2. Explorar e avaliar os dados
+
 ### __Descrição dos conjuntos de dados__
 
 Os conjutos de dados utilizados inicialmente são oriundos do governo brasileiro e disponibilizados de forma aberta.
@@ -164,13 +166,33 @@ Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os ca
 
 </br>
 
-
 __Dados complementares IBGE__
 
 __Códigos municípios segundo IBGE__
 
 Fonte: ftp://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2020/DTB_2020_v2.zip
 Disponibilizado em: https://www.ibge.gov.br/explica/codigos-dos-municipios.php
+
+## 3. Definir o modelo de dados
+
+### __O que a aplicação faz__
+
+todo:
+
+Requi
+
+
+## Requisitos funcionais:
+
+- Transformar do formato de origem para o de destino   
+- Permitir criar implementações de transformações de forma customizadas no futuro
+    - Por padrão é utilizado um pipeline usando dataframe
+- Permitir definir as configurações do spark via:
+    - linha de comando (spark-submit)
+    - parâmetros de aplicação
+- Permitir definir as configurações por formato de leitura/escrita (origem/destino) via:
+    - parâmetros de aplicação
+- Permitir selecionar o pipeline de transformação de acordo com os parâmetros de origem e destino
 
 # Melhorias futuras
 
@@ -180,7 +202,7 @@ __Dados populacionais__
 
 Coletar dados relacionados a população brasileira para subsidiar análises relacionadas a abertura de empresas ou detecção de oportunidades.
 
-__Inforamções relacionadas a valores de terrenos e imóveis__
+__Informações relacionadas a valores de terrenos e imóveis__
 
 Coletar dados relacionados a preço de compra e venda de imóveis e terrenos para que seja possível subsidiar análises relacionadas a abertura de empresas, detecção de oportunidades e concorrência.
 
