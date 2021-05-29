@@ -2,11 +2,10 @@ package application.batch.pipeline;
 
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
+import application.batch.mappers.cnpj.SimpleNationalRawToModel;
 import application.batch.models.args.Parameters;
-import org.apache.spark.sql.DataFrameReader;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import application.batch.models.cnpj.SimpleNational;
+import org.apache.spark.sql.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +35,15 @@ public class CnpjRaw implements IPipeline {
 
         Dataset<Row> establishment_df  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER);
         Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER);
+        Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
+        showDataSet(simpleNationalDataset);
+    }
 
+    private void showDataSet(Dataset<SimpleNational> ds) {
+        ds.show(5);
+        ds.printSchema();
+        long total = ds.count();
+        System.out.println("*** total records: " + total);
     }
 
     /**
