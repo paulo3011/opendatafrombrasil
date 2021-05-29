@@ -9,6 +9,7 @@ import org.apache.spark.sql.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class CnpjRaw implements IPipeline {
 
@@ -33,13 +34,14 @@ public class CnpjRaw implements IPipeline {
     public void Start(SparkSession sparkSession, Parameters parameters) {
         parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
 
-        Dataset<Row> establishment_df  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER);
-        Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER);
+        Dataset<Row> establishment_df  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, true);
+        Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, true);
         Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
         showDataSet(simpleNationalDataset);
     }
 
     private void showDataSet(Dataset<SimpleNational> ds) {
+        List<SimpleNational> list = ds.collectAsList();
         ds.show(5);
         ds.printSchema();
         long total = ds.count();
@@ -58,7 +60,7 @@ public class CnpjRaw implements IPipeline {
      * @see <a href="https://spark.apache.org/docs/latest/sql-data-sources-generic-options.html#path-global-filter">path-global-filter</a>
      * @see <a href="https://mincong.io/2019/04/16/glob-expression-understanding/">glob-expression-understanding</a>
      */
-    public Dataset<Row> getDataFrame(SparkSession spark, Parameters parameters, String pathGlobFilter, String defautFolder)
+    public Dataset<Row> getDataFrame(SparkSession spark, Parameters parameters, String pathGlobFilter, String defautFolder, boolean cache)
     {
         /*
         Rules:
@@ -85,6 +87,9 @@ public class CnpjRaw implements IPipeline {
             reader = reader.option("pathGlobFilter", pathGlobFilter);
 
         Dataset<Row> df = reader.load(inputPath.toString());
+
+        if(cache)
+            df.cache();
 
         System.out.printf("*** %s ingested in a dataframe \n", pathGlobFilter);
         df.show(5);
