@@ -27,4 +27,19 @@ public class CnpjUtils {
 
         return date;
     }
+
+    /**
+     * Returns the local date for the row and index using CNPJ dataset date format.
+     * @param value The Row with values
+     * @param index The Row index to get the value
+     * @return Return null if no date were found or the LocalDate found
+     */
+    public static String getLocalDateAsString(Row value, int index) {
+
+        LocalDate date = getLocalDate(value, index);
+        if (date != null)
+            return date.toString();
+
+        return null;
+    }
 }

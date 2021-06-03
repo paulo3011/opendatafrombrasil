@@ -3,8 +3,10 @@ package application.batch.pipeline;
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
+import application.batch.mappers.cnpj.EstablishmentsRawToModel;
 import application.batch.mappers.cnpj.SimpleNationalRawToModel;
 import application.batch.models.args.Parameters;
+import application.batch.models.cnpj.Establishment;
 import application.batch.models.cnpj.SimpleNational;
 import org.apache.spark.sql.*;
 
@@ -34,8 +36,9 @@ public class CnpjRaw implements IPipeline {
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
         parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
-        parameters.setOutputFileFormat(FileFormat.orc);
-        //parameters.setOutputFileFormat(FileFormat.parquet);
+        //parameters.setOutputFileFormat(FileFormat.orc);
+        parameters.setOutputFileFormat(FileFormat.parquet);
+        parameters.setOutputFileType(FileType.cnpj_lake);
         runTransformation(sparkSession,parameters,true);
     }
 
@@ -144,6 +147,7 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        runEstablishmentTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
     }
 
@@ -171,6 +175,34 @@ public class CnpjRaw implements IPipeline {
             Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
             DataFrameWriter<SimpleNational> simpleNationalWriter = getDataFrameWriter(simpleNationalDataset, parameters);
             simpleNationalWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the Establishment Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runEstablishmentTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> simpleNationalWriter = getDataFrameWriter(sourceDf, parameters);
+            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
+
+            //do compy raw mapper
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<Establishment> dataset = sourceDf.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
+            //debugDataSet(dataset);
+            DataFrameWriter<Establishment> simpleNationalWriter = getDataFrameWriter(dataset, parameters);
+            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
         }
     }
 }
