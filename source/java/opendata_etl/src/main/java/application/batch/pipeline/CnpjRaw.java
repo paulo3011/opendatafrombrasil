@@ -3,35 +3,53 @@ package application.batch.pipeline;
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
+import application.batch.mappers.cnpj.CompanyRawToModel;
 import application.batch.mappers.cnpj.EstablishmentsRawToModel;
 import application.batch.mappers.cnpj.SimpleNationalRawToModel;
 import application.batch.models.args.Parameters;
+import application.batch.models.cnpj.Company;
 import application.batch.models.cnpj.Establishment;
 import application.batch.models.cnpj.SimpleNational;
 import org.apache.spark.sql.*;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CnpjRaw implements IPipeline {
 
     /**
-     * Glob pattern to filter input files of type Simple National.
+     * Glob pattern to filter input files of type Simple National from CNPJ dataset.
      */
     private static final String SIMPLE_NATIONAL_RAW_GLOB = "*.SIMPLES.*";
     /**
-     * Default folder where this program will saves output files of type Simple National.
+     * Default folder where this program will saves output files of type Simple National from CNPJ dataset.
      */
     private static final String SIMPLE_NATIONAL_FOLDER = "simple_national";
     /**
-     * Glob pattern to filter input files of type establishment.
+     * Glob pattern to filter input files of type Establishment from CNPJ dataset.
      */
     private static final String ESTABLISHMENT_RAW_GLOB = "*.ESTABELE";
     /**
-     * Default folder where this program will saves output files of type Establishment
+     * Default folder where this program will saves output files of type Establishment from CNPJ dataset.
      */
     private static final String ESTABLISHMENT_FOLDER = "establishment";
+
+    /**
+     * Glob pattern to filter input files of type Company from CNPJ dataset.
+     */
+    private static final String COMPANY_RAW_GLOB = "*.EMPRECSV";
+    /**
+     * Default folder where this program will saves output files of type Company from CNPJ dataset.
+     */
+    private static final String COMPANY_FOLDER = "company";
+    /**
+     * Default folder where this program will saves output files resulting of join between Company and Establishment datasets from CNPJ dataset.
+     */
+    private static final String FULL_COMPANY_FOLDER = "full_company";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -147,7 +165,7 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        runEstablishmentTransformation(sparkSession,parameters,cache);
+        runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
     }
 
@@ -179,13 +197,14 @@ public class CnpjRaw implements IPipeline {
     }
 
     /**
-     * Execute the Establishment Transformation.
+     * Execute the Establishment and Company Transformation.
      * @param sparkSession Spark Session
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runEstablishmentTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+    public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, cache);
+        Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, cache);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -193,16 +212,35 @@ public class CnpjRaw implements IPipeline {
             DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
 
-
+            DataFrameWriter<Row> companyDfWriter = getDataFrameWriter(companySourceDf, parameters);
+            companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
         }
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
             //transform to lake model
-            Dataset<Establishment> dataset = sourceDf.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
+            Dataset<Establishment> establishmentDataset = sourceDf.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
             //debugDataSet(dataset);
-            DataFrameWriter<Establishment> dfWriter = getDataFrameWriter(dataset, parameters);
+            DataFrameWriter<Establishment> dfWriter = getDataFrameWriter(establishmentDataset, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
+
+            //transform to lake model
+            Dataset<Company> companyDataset = companySourceDf.map(new CompanyRawToModel(), Encoders.bean(Company.class));
+            //debugDataSet(dataset);
+            DataFrameWriter<Company> companyDfWriter = getDataFrameWriter(companyDataset, parameters);
+            companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
+
+            //Unify establishment and company dataframes
+            ArrayList<String> columns = new ArrayList<>();
+            columns.add("basicCnpj");
+            Dataset<Row> joinedDs = establishmentDataset.join(companyDataset, convertListToSeq(columns), "left");
+            debugDataSet(joinedDs);
+            DataFrameWriter<Row> joinedDsDfWriter = getDataFrameWriter(joinedDs, parameters);
+            joinedDsDfWriter.save(Paths.get(parameters.getInputPath(), FULL_COMPANY_FOLDER).toString());
         }
+    }
+
+    public Seq<String> convertListToSeq(List<String> inputList) {
+        return JavaConverters.asScalaIteratorConverter(inputList.iterator()).asScala().toSeq();
     }
 }
