@@ -158,23 +158,23 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, cache);
-        //debugDataSet(simple_national_df);
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, cache);
+        //debugDataSet(sourceDf);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
             //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> simpleNationalWriter = getDataFrameWriter(simple_national_df, parameters);
-            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
         }
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
             //debugDataSet(simpleNationalDataset);
             //transform to lake model
-            Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
-            DataFrameWriter<SimpleNational> simpleNationalWriter = getDataFrameWriter(simpleNationalDataset, parameters);
-            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
+            Dataset<SimpleNational> dataset = sourceDf.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
+            DataFrameWriter<SimpleNational> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
         }
     }
 
@@ -190,10 +190,10 @@ public class CnpjRaw implements IPipeline {
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
             //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> simpleNationalWriter = getDataFrameWriter(sourceDf, parameters);
-            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
 
-            //do compy raw mapper
+
         }
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
@@ -201,8 +201,8 @@ public class CnpjRaw implements IPipeline {
             //transform to lake model
             Dataset<Establishment> dataset = sourceDf.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
             //debugDataSet(dataset);
-            DataFrameWriter<Establishment> simpleNationalWriter = getDataFrameWriter(dataset, parameters);
-            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
+            DataFrameWriter<Establishment> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
         }
     }
 }
