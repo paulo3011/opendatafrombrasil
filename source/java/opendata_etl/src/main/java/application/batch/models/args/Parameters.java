@@ -62,6 +62,7 @@ public class Parameters {
     )
     private FileFormat outputFileFormat = FileFormat.csv;
 
+    @SuppressWarnings("unused")
     public Parameters(){}
     public Parameters(String[] argv){
         System.out.println("Parsing parameters..");

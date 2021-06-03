@@ -5,6 +5,7 @@ package application.batch.enums;
  *
  * Tipos de formatos de arquivos suportados para origem (input do ETL) ou destino (output do ETL)
  */
+@SuppressWarnings("unused")
 public enum FileFormat {
     csv,
     json,

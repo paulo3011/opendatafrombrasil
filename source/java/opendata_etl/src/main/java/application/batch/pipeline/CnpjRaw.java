@@ -2,6 +2,7 @@ package application.batch.pipeline;
 
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
+import application.batch.enums.FileType;
 import application.batch.mappers.cnpj.SimpleNationalRawToModel;
 import application.batch.models.args.Parameters;
 import application.batch.models.cnpj.SimpleNational;
@@ -33,20 +34,19 @@ public class CnpjRaw implements IPipeline {
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
         parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
-
-        Dataset<Row> establishment_df  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, true);
-        Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, true);
-        Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
-        showDataSet(simpleNationalDataset);
+        parameters.setOutputFileFormat(FileFormat.orc);
+        //parameters.setOutputFileFormat(FileFormat.parquet);
+        runTransformation(sparkSession,parameters,true);
     }
 
-    private void showDataSet(Dataset<SimpleNational> ds) {
-        List<SimpleNational> list = ds.collectAsList();
+    @SuppressWarnings("unused")
+    private <T> void debugDataSet(Dataset<T> ds) {
+        List<T> list = ds.collectAsList();
         ds.show(5);
         ds.printSchema();
         long total = ds.count();
         System.out.println("*** total records: " + total);
-    }
+    }    
 
     /**
      * Create and returns one dataframe for reading the data.
@@ -91,12 +91,86 @@ public class CnpjRaw implements IPipeline {
         if(cache)
             df.cache();
 
+        /*
         System.out.printf("*** %s ingested in a dataframe \n", pathGlobFilter);
         df.show(5);
         df.printSchema();
         long total = df.count(); //27600101
         System.out.println("*** total records: " + total);
+        */
 
         return df;
+    }
+
+    /**
+     * Create and returns one generic dataframe writer to output data to output path.
+     * (Retorna um escritor genérico de dataframe para salvar os dados)
+     * @param dataset The dataset for write to output
+     * @param parameters The app parameters
+     * @param <T> The type of rows of the dataset
+     * @return DataFrameWriter<T>
+     *
+     * @see <a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/DataFrameWriter.html">DataFrameWriter Mode - Java</a>
+     * @see <a href="http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameWriter.mode.html#pyspark.sql.DataFrameWriter.mode">DataFrameWriter Mode - Python</a>
+     * @see <a href="http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameWriter.option.html#pyspark.sql.DataFrameWriter.option">About timezone option</a>
+     * @see <a href="http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameWriter.csv.html#pyspark.sql.DataFrameWriter.csv">CSV options</a>
+     */
+    public <T> DataFrameWriter<T> getDataFrameWriter(Dataset<T> dataset, Parameters parameters)
+    {
+        FileFormat outputFormat = parameters.getOutputFileFormat();
+
+        DataFrameWriter<T> dfWriter = dataset.write().format(outputFormat.toString().toLowerCase());
+        dfWriter.mode(SaveMode.Overwrite);
+
+        //to improve can be implemented custom options for the target output format in the same way as Parameters.sparkConf
+        //e.g. http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameWriter.csv.html#pyspark.sql.DataFrameWriter.csv options can be set using write.option()
+        //dfWriter.option("","");
+
+        if(outputFormat == FileFormat.orc){
+            dfWriter.option("compression","snappy");
+        }
+        if(outputFormat == FileFormat.csv){
+            //the same format as original
+            dfWriter.option("header","false");
+        }
+
+        return dfWriter;
+    }
+
+    /**
+     * Execute the Transformations jobs.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        runSimpleNationalTransformation(sparkSession,parameters,cache);
+    }
+
+    /**
+     * Execute the Simple National Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> simple_national_df  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, cache);
+        //debugDataSet(simple_national_df);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> simpleNationalWriter = getDataFrameWriter(simple_national_df, parameters);
+            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //debugDataSet(simpleNationalDataset);
+            //transform to lake model
+            Dataset<SimpleNational> simpleNationalDataset = simple_national_df.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
+            DataFrameWriter<SimpleNational> simpleNationalWriter = getDataFrameWriter(simpleNationalDataset, parameters);
+            simpleNationalWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
+        }
     }
 }
