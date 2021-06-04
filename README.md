@@ -23,13 +23,13 @@ Este projeto seguiu as seguintes etapas:
 
 ### __Escopo do projeto__
 
-Este projeto tem como objetivo final permitir que as pessoas possam fazer análises relacionadas as empresas brasileiras e dar base para tomadas de decisões, com base na concorrência e ou outros fatores observados, como por exemplo: 
+Este projeto tem como objetivo final permitir que as pessoas possam fazer análises relacionadas as empresas brasileiras e dar base para tomada de decisões, com base na concorrência e ou outros fatores observados, como por exemplo: 
 
 - Em que cidade é um bom local para abrir uma empresa?
-- Quais são os clientes, cidades ou regiões que é possível explorar?
+- Quais são os clientes (empresas ou pessoas que são sócias de alguma empresa), cidades ou regiões em que é possível atuar ou oferecer serviços e produtos?
 - Qual o tamanho do mercado disponível?
 - Quem são meus clientes, quais empresas eles possuem, existe alguma informação de contato disponível?
-- Faço alguma abordagem diferenciada para alguns clientes em função de existir clientes se relacionando entre si?
+- Faço alguma abordagem diferenciada para alguns clientes em função de existir conexão (sociedade) entre clientes?
 
 ## 2. Explorar e avaliar os dados
 
