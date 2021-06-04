@@ -15,9 +15,9 @@ public class EstablishmentsRawToModel implements MapFunction<Row, Establishment>
         record.setCnpjCheckingDigit(value.getAs(2));
         record.setMatrixBranch(Short.decode(value.getAs(3)));
         record.setFantasyName(value.getAs(4));
-        record.setRegistrationSituation(Short.decode(value.getAs(5)));
-        record.setDateRegistrationSituation(CnpjUtils.getLocalDateAsString(value,6));
-        record.setReasonRegistrationSituation(value.getAs(7));
+        record.setRegistrationStatus(Short.decode(value.getAs(5)));
+        record.setDateRegistrationStatus(CnpjUtils.getLocalDateAsString(value,6));
+        record.setReasonRegistrationStatus(Integer.decode(value.getAs(7)));
         record.setNameCityAbroad(value.getAs(8));
         record.setCountryCode(value.getAs(9));
         record.setActivityStartDate(CnpjUtils.getLocalDateAsString(value,10));
@@ -29,7 +29,7 @@ public class EstablishmentsRawToModel implements MapFunction<Row, Establishment>
         record.setAddressComplement(value.getAs(16));
         record.setAddressDistrict(value.getAs(17));
         record.setZipCode(value.getAs(18));
-        record.setFederationUnit(value.getAs(19));
+        record.setState(value.getAs(19));
         record.setCityJurisdictionCode(value.getAs(20));
         record.setTelephone1AreaCode(value.getAs(21));
         record.setTelephone1(value.getAs(22));
@@ -37,7 +37,7 @@ public class EstablishmentsRawToModel implements MapFunction<Row, Establishment>
         record.setTelephone2(value.getAs(24));
         record.setFaxAreaCode(value.getAs(25));
         record.setFaxNumber(value.getAs(26));
-        record.setContributorsEmail(value.getAs(27));
+        record.setTaxpayerEmail(value.getAs(27));
         record.setSpecialSituation(value.getAs(28));
         record.setSpecialSituationDate(CnpjUtils.getLocalDateAsString(value,29));
 
