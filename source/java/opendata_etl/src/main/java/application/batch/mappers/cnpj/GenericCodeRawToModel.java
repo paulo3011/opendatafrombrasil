@@ -1,6 +1,6 @@
 package application.batch.mappers.cnpj;
 
-import application.batch.models.cnpj.GenericCode;
+import application.batch.models.cnpj.genericcodes.GenericCode;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Row;
 

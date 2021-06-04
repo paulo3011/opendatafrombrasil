@@ -1,4 +1,4 @@
-package application.batch.models.cnpj;
+package application.batch.models.cnpj.genericcodes;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -6,6 +6,7 @@ import application.batch.enums.FileType;
 import application.batch.mappers.cnpj.*;
 import application.batch.models.args.Parameters;
 import application.batch.models.cnpj.*;
+import application.batch.models.cnpj.genericcodes.*;
 import org.apache.spark.sql.*;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
