@@ -62,6 +62,14 @@ public class CnpjRaw implements IPipeline {
      * Default folder where this program will saves output files of type City Code from CNPJ dataset.
      */
     private static final String CITY_CODE_FOLDER = "city_code";
+    /**
+     * Glob pattern to filter input files of type CNAE Code from CNPJ dataset.
+     */
+    private static final String CNAE_CODE_RAW_GLOB = "*.CNAECSV";
+    /**
+     * Default folder where this program will saves output files of type CNAE Code from CNPJ dataset.
+     */
+    private static final String CNAE_CODE_FOLDER = "cnae_code";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -286,6 +294,17 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        runCityCodeTransformation(sparkSession, parameters, cache);
+        runCnaeCodeTransformation(sparkSession, parameters, cache);
+    }
+
+    /**
+     * Execute the City Codes Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runCityCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CITY_CODE_RAW_GLOB, CITY_CODE_FOLDER, cache);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
@@ -301,6 +320,31 @@ public class CnpjRaw implements IPipeline {
             Dataset<CityCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CityCode.class), Encoders.bean(CityCode.class));
             DataFrameWriter<CityCode> dfWriter = getDataFrameWriter(dataset, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), CITY_CODE_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the CNAE Codes Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runCnaeCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CNAE_CODE_RAW_GLOB, CNAE_CODE_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), CNAE_CODE_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<CnaeCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CnaeCode.class), Encoders.bean(CnaeCode.class));
+            DataFrameWriter<CnaeCode> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), CNAE_CODE_FOLDER).toString());
         }
     }
 
