@@ -3,32 +3,34 @@ package application.batch.models.cnpj;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 public class Company {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
      *
-     * NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).
+     * NUMERO BASE DE INSCRICAO NO CNPJ (OITO PRIMEIROS DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String basicCnpj;
     /**
      * CORPORATE NAME IS YOUR COMPANY'S REGISTERED NAME.
      *
-     * NOME EMPRESARIAL DA PESSOA JURÍDICA
+     * NOME EMPRESARIAL DA PESSOA JURIDICA
      */
     @Getter @Setter
     private String legalName;
     /**
      * CODE OF LEGAL NATURE
      *
-     * CÓDIGO DA NATUREZA JURÍDICA
+     * CÓDIGO DA NATUREZA JURIDICA
      */
     @Getter @Setter
     private String legalNature;
     /**
      * QUALIFICATION OF THE INDIVIDUAL RESPONSIBLE FOR THE COMPANY
      *
-     * QUALIFICAÇÃO DA PESSOA FÍSICA RESPONSÁVEL PELA EMPRESA
+     * QUALIFICACAO DA PESSOA FISICA RESPONSAVEL PELA EMPRESA
      */
     @Getter @Setter
     private String responsibleQualification;
@@ -38,7 +40,7 @@ public class Company {
      * CAPITAL SOCIAL DA EMPRESA
      */
     @Getter @Setter
-    private String companyCapital;
+    private BigDecimal companyCapital;
     /**
      * COMPANY PORT CODE:
      * 1  - NOT INFORMED
@@ -47,7 +49,7 @@ public class Company {
      * 05 - OTHERS
      *
      * CÓDIGO DO PORTE DA EMPRESA:
-     * 1  – NÃO INFORMADO
+     * 1  – NAO INFORMADO
      * 2  - MICRO EMPRESA
      * 03 - EMPRESA DE PEQUENO PORTE
      * 05 - DEMAIS
@@ -57,7 +59,7 @@ public class Company {
     /**
      * THE RESPONSIBLE FEDERATIVE ENTITY IS COMPLETED FOR THE CASES OF ORGANS AND ENTITIES OF THE GROUP OF LEGAL NATURE 1XXX. FOR OTHER NATURES, THIS ATTRIBUTE IS BLANK.
      *
-     * O ENTE FEDERATIVO RESPONSÁVEL É PREENCHIDO PARA OS CASOS DE ÓRGÃOS E ENTIDADES DO GRUPO DE NATUREZA JURÍDICA 1XXX. PARA AS DEMAIS NATUREZAS, ESTE ATRIBUTO FICA EM BRANCO.
+     * O ENTE FEDERATIVO RESPONSAVEL E PREENCHIDO PARA OS CASOS DE ORGAOS E ENTIDADES DO GRUPO DE NATUREZA JURIDICA 1XXX. PARA AS DEMAIS NATUREZAS, ESTE ATRIBUTO FICA EM BRANCO.
      */
     @Getter @Setter
     private String federatedEntityResponsible;

@@ -14,14 +14,20 @@ public class SimpleNationalRawToModel implements MapFunction<Row, SimpleNational
 
     @Override
     public SimpleNational call(Row value) {
-        SimpleNational record = new SimpleNational();
-        record.setBasicCnpj(value.getAs(0));
-        record.setIsSimple(value.getAs(1).equals("S"));
-        record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value,2));
-        record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value,3));
-        record.setIsMei(value.getAs(4).equals("S"));
-        record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value,5));
-        record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value,6));
-        return record;
+        try {
+            SimpleNational record = new SimpleNational();
+            record.setBasicCnpj(value.getAs(0));
+            record.setIsSimple(value.getAs(1).equals("S"));
+            record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value, 2));
+            record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value, 3));
+            record.setIsMei(value.getAs(4).equals("S"));
+            record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value, 5));
+            record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value, 6));
+            return record;
+        }
+        catch (Exception ex){
+            System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());
+            return null;
+        }
     }
 }

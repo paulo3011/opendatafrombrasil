@@ -11,14 +11,20 @@ public class GenericCodeRawToModel<T extends GenericCode> implements MapFunction
     }
 
     @Override
-    public T call(Row value) throws Exception {
-        T record = tClass.getDeclaredConstructor().newInstance();
+    public T call(Row value)  {
+        try {
+            T record = tClass.getDeclaredConstructor().newInstance();
 
-        //note: In Java, numbers prefixed with a "0" are treated as octal.
-        //java.lang.NumberFormatException: For input string: "008" under radix 8
-        record.setCode(Integer.parseInt(value.getAs(0)));
-        record.setDescription(value.getAs(1));
+            //note: In Java, numbers prefixed with a "0" are treated as octal.
+            //java.lang.NumberFormatException: For input string: "008" under radix 8
+            record.setCode(Integer.parseInt(value.getAs(0)));
+            record.setDescription(value.getAs(1));
 
-        return record;
+            return record;
+        }
+        catch (Exception ex){
+            System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());
+            return null;
+        }
     }
 }

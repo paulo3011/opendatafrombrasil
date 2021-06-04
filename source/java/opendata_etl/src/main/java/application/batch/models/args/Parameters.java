@@ -52,7 +52,7 @@ public class Parameters {
             names = "--output-type",
             description = "The file type to be saved. cnpj_raw or cnpj_lake",
             converter = FileTypeConverter.class)
-    private FileType outputFileType = FileType.cnpj_raw;
+    private FileType outputFileType = FileType.cnpj_lake;
 
     @Getter @Setter
     @Parameter(
@@ -60,7 +60,7 @@ public class Parameters {
             description = "The format of the input files. csv or orc",
             converter = FileFormatConverter.class
     )
-    private FileFormat outputFileFormat = FileFormat.csv;
+    private FileFormat outputFileFormat = FileFormat.parquet;
 
     @SuppressWarnings("unused")
     public Parameters(){}

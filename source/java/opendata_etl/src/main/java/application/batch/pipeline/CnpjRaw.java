@@ -98,10 +98,9 @@ public class CnpjRaw implements IPipeline {
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
         //parameters.setOutputFileFormat(FileFormat.orc);
-        parameters.setOutputFileFormat(FileFormat.parquet);
-        parameters.setOutputFileType(FileType.cnpj_lake);
         runTransformation(sparkSession,parameters,true);
     }
 
