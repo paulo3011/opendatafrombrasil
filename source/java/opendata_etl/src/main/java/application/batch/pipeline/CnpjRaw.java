@@ -3,15 +3,9 @@ package application.batch.pipeline;
 import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
-import application.batch.mappers.cnpj.CompanyRawToModel;
-import application.batch.mappers.cnpj.EstablishmentsRawToModel;
-import application.batch.mappers.cnpj.PartnerRawToModel;
-import application.batch.mappers.cnpj.SimpleNationalRawToModel;
+import application.batch.mappers.cnpj.*;
 import application.batch.models.args.Parameters;
-import application.batch.models.cnpj.Company;
-import application.batch.models.cnpj.Establishment;
-import application.batch.models.cnpj.Partner;
-import application.batch.models.cnpj.SimpleNational;
+import application.batch.models.cnpj.*;
 import org.apache.spark.sql.*;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -60,6 +54,14 @@ public class CnpjRaw implements IPipeline {
      * Default folder where this program will saves output files of type Partner from CNPJ dataset.
      */
     private static final String PARTNER_FOLDER = "partner";
+    /**
+     * Glob pattern to filter input files of type City Code from CNPJ dataset.
+     */
+    private static final String CITY_CODE_RAW_GLOB = "*.MUNICCSV";
+    /**
+     * Default folder where this program will saves output files of type City Code from CNPJ dataset.
+     */
+    private static final String CITY_CODE_FOLDER = "city_code";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -175,6 +177,7 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        runGenericCodeTransformation(sparkSession,parameters,cache);
         runPartnerTransformation(sparkSession,parameters,cache);
         runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
@@ -273,6 +276,31 @@ public class CnpjRaw implements IPipeline {
             Dataset<Partner> dataset = sourceDf.map(new PartnerRawToModel(), Encoders.bean(Partner.class));
             DataFrameWriter<Partner> dfWriter = getDataFrameWriter(dataset, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the Generic Codes Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CITY_CODE_RAW_GLOB, CITY_CODE_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), CITY_CODE_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<CityCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CityCode.class), Encoders.bean(CityCode.class));
+            DataFrameWriter<CityCode> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), CITY_CODE_FOLDER).toString());
         }
     }
 
