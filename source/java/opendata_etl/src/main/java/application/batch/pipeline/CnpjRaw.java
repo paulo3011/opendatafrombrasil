@@ -78,6 +78,14 @@ public class CnpjRaw implements IPipeline {
      * Default folder where this program will saves output files of type Country Code from CNPJ dataset.
      */
     private static final String COUNTRY_CODE_FOLDER = "country_code";
+    /**
+     * Glob pattern to filter input files of type Legal Nature Code from CNPJ dataset.
+     */
+    private static final String LEGAL_NATURE_CODE_RAW_GLOB = "*.NATJUCSV";
+    /**
+     * Default folder where this program will saves output files of type Legal Nature Code from CNPJ dataset.
+     */
+    private static final String LEGAL_NATURE_CODE_FOLDER = "legal_nature_code";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -305,6 +313,7 @@ public class CnpjRaw implements IPipeline {
         runCityCodeTransformation(sparkSession, parameters, cache);
         runCnaeCodeTransformation(sparkSession, parameters, cache);
         runCountryCodeTransformation(sparkSession, parameters, cache);
+        runLegalNatureCodeTransformation(sparkSession, parameters, cache);
     }
 
     /**
@@ -358,7 +367,7 @@ public class CnpjRaw implements IPipeline {
     }
 
     /**
-     * Execute the CNAE Codes Transformation.
+     * Execute the Country Codes Transformation.
      * @param sparkSession Spark Session
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
@@ -379,6 +388,31 @@ public class CnpjRaw implements IPipeline {
             Dataset<CountryCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CountryCode.class), Encoders.bean(CountryCode.class));
             DataFrameWriter<CountryCode> dfWriter = getDataFrameWriter(dataset, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), COUNTRY_CODE_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the Legal Nature Codes Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runLegalNatureCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, LEGAL_NATURE_CODE_RAW_GLOB, LEGAL_NATURE_CODE_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), LEGAL_NATURE_CODE_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<LegalNatureCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(LegalNatureCode.class), Encoders.bean(LegalNatureCode.class));
+            DataFrameWriter<LegalNatureCode> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), LEGAL_NATURE_CODE_FOLDER).toString());
         }
     }
 
