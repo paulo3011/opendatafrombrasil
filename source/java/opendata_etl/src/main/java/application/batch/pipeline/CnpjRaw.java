@@ -70,6 +70,14 @@ public class CnpjRaw implements IPipeline {
      * Default folder where this program will saves output files of type CNAE Code from CNPJ dataset.
      */
     private static final String CNAE_CODE_FOLDER = "cnae_code";
+    /**
+     * Glob pattern to filter input files of type Country Code from CNPJ dataset.
+     */
+    private static final String COUNTRY_CODE_RAW_GLOB = "*.PAISCSV";
+    /**
+     * Default folder where this program will saves output files of type Country Code from CNPJ dataset.
+     */
+    private static final String COUNTRY_CODE_FOLDER = "country_code";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -296,6 +304,7 @@ public class CnpjRaw implements IPipeline {
     public void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         runCityCodeTransformation(sparkSession, parameters, cache);
         runCnaeCodeTransformation(sparkSession, parameters, cache);
+        runCountryCodeTransformation(sparkSession, parameters, cache);
     }
 
     /**
@@ -345,6 +354,31 @@ public class CnpjRaw implements IPipeline {
             Dataset<CnaeCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CnaeCode.class), Encoders.bean(CnaeCode.class));
             DataFrameWriter<CnaeCode> dfWriter = getDataFrameWriter(dataset, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), CNAE_CODE_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the CNAE Codes Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runCountryCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, COUNTRY_CODE_RAW_GLOB, COUNTRY_CODE_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), COUNTRY_CODE_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<CountryCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CountryCode.class), Encoders.bean(CountryCode.class));
+            DataFrameWriter<CountryCode> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), COUNTRY_CODE_FOLDER).toString());
         }
     }
 
