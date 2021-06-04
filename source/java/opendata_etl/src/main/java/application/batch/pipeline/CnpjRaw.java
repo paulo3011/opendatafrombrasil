@@ -5,10 +5,12 @@ import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
 import application.batch.mappers.cnpj.CompanyRawToModel;
 import application.batch.mappers.cnpj.EstablishmentsRawToModel;
+import application.batch.mappers.cnpj.PartnerRawToModel;
 import application.batch.mappers.cnpj.SimpleNationalRawToModel;
 import application.batch.models.args.Parameters;
 import application.batch.models.cnpj.Company;
 import application.batch.models.cnpj.Establishment;
+import application.batch.models.cnpj.Partner;
 import application.batch.models.cnpj.SimpleNational;
 import org.apache.spark.sql.*;
 import scala.collection.JavaConverters;
@@ -50,6 +52,14 @@ public class CnpjRaw implements IPipeline {
      * Default folder where this program will saves output files resulting of join between Company and Establishment datasets from CNPJ dataset.
      */
     private static final String FULL_COMPANY_FOLDER = "full_company";
+    /**
+     * Glob pattern to filter input files of type Partner from CNPJ dataset.
+     */
+    private static final String PARTNER_RAW_GLOB = "*.SOCIOCSV";
+    /**
+     * Default folder where this program will saves output files of type Partner from CNPJ dataset.
+     */
+    private static final String PARTNER_FOLDER = "partner";
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters) {
@@ -165,6 +175,7 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        runPartnerTransformation(sparkSession,parameters,cache);
         runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
     }
@@ -237,6 +248,31 @@ public class CnpjRaw implements IPipeline {
             debugDataSet(joinedDs);
             DataFrameWriter<Row> joinedDsDfWriter = getDataFrameWriter(joinedDs, parameters);
             joinedDsDfWriter.save(Paths.get(parameters.getInputPath(), FULL_COMPANY_FOLDER).toString());
+        }
+    }
+
+    /**
+     * Execute the Partner Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runPartnerTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, cache);
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_FOLDER).toString());
+        }
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            Dataset<Partner> dataset = sourceDf.map(new PartnerRawToModel(), Encoders.bean(Partner.class));
+            DataFrameWriter<Partner> dfWriter = getDataFrameWriter(dataset, parameters);
+            dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_FOLDER).toString());
         }
     }
 

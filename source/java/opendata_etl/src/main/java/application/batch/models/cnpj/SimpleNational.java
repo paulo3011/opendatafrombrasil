@@ -4,6 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class SimpleNational {
+    /**
+     * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
+     *
+     * NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).
+     */
     @Getter @Setter
     private String basicCnpj;
     @Getter @Setter
