@@ -29,6 +29,7 @@ import java.util.List;
 
 public class CnpjRaw implements IPipeline {
 
+    //#region constants
     /**
      * Glob pattern to filter input files of type Simple National from CNPJ dataset.
      */
@@ -110,25 +111,30 @@ public class CnpjRaw implements IPipeline {
      * Default folder for files resulting from raw data analysis.
      */
     private static final String OUTPUT_FOLDER_FOR_RAW_ANALYSE = "analyze";
+    //#endregion
 
     @Override
-    public void Start(SparkSession sparkSession, Parameters parameters) {
+    public void Start(SparkSession sparkSession, Parameters parameters)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
-        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
         //parameters.setOutputFileFormat(FileFormat.orc);
 
-        //this.analyzeRawData(sparkSession, parameters);
+        //this.loadTest(sparkSession);
+        this.analyzeRawData(sparkSession, parameters);
 
-        runTransformation(sparkSession,parameters,true);
+        //runTransformation(sparkSession,parameters,true);
     }
 
     @SuppressWarnings("unused")
     private void analyzeRawData(SparkSession sparkSession, Parameters parameters)
             throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException
     {
-        this.analyzeRawData(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyRawToModel.class, Company.class, CompanySchema.getSchema());
         this.analyzeRawData(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsRawToModel.class, Establishment.class, EstablishmentSchema.getSchema());
+        this.analyzeRawData(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyRawToModel.class, Company.class, CompanySchema.getSchema());
+        this.analyzeRawData(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalRawToModel.class, SimpleNational.class, SimpleNationalSchema.getSchema());
+        this.analyzeRawData(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerRawToModel.class, Partner.class, PartnerSchema.getSchema());
     }
 
     /**
@@ -189,7 +195,17 @@ public class CnpjRaw implements IPipeline {
                 .option("header", "false")
                 .option("sep",";")
                 .option("encoding","ISO-8859-1")
+                .option("unescapedQuoteHandling","STOP_AT_DELIMITER")
+                .option("quote", "")// turn off quotations to handle manually
                 ;
+
+        Dataset<Row> df1 = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\K3241.K03200Y0.D10410.ESTABELE").cache();
+        Object filtered = df1.filter(df1.col("basic_cnpj").equalTo("20100518")).take(1);
+        //Object ldf1 = df1.take(4);
+        this.debugDataSet(df1);
+        Dataset<Establishment> dfc1 = df1.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
+        Object r1 = dfc1.collect();
+        this.debugDataSet(dfc1);
 
         Dataset<Row> df = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\K3241.K03200Y0.D10410.EMPRECSV").cache();
         this.debugDataSet(df);
@@ -247,6 +263,7 @@ public class CnpjRaw implements IPipeline {
         //spark.sparkContext().textFile()
 
         //seealso: http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameReader.csv.html#pyspark.sql.DataFrameReader.csv
+        //seealso: http://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.sql.DataFrameReader.csv.html?highlight=textfile
         DataFrameReader reader = spark.read()
                 .format(inputFormat.toString().toLowerCase())
                 .option("inferSchema", "false")
@@ -255,6 +272,8 @@ public class CnpjRaw implements IPipeline {
                 .option("encoding","ISO-8859-1")
                 .option("mode","PERMISSIVE")
                 .option("columnNameOfCorruptRecord","rawData")
+                .option("unescapedQuoteHandling","STOP_AT_DELIMITER")
+                .option("quote", "")// turn off quotations to handle manually
                 ;
 
         if(pathGlobFilter != null)

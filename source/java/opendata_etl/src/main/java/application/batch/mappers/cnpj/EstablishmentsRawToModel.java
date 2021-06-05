@@ -9,36 +9,37 @@ public class EstablishmentsRawToModel implements MapFunction<Row, Establishment>
     @Override
     public Establishment call(Row value) {
         Establishment record = new Establishment();
+        //todo testar cnpj 36452531, tem vários cnaes e parece estar se perdendo nas colunas
         try {
-            record.setBasicCnpj(value.getAs("basic_cnpj"));
-            record.setCnpjOrder(value.getAs("cnpj_order"));
-            record.setCnpjCheckingDigit(value.getAs("cnpj_checking_digit"));
-            record.setMatrixBranch(Short.decode(value.getAs("matrix_branch")));
-            record.setFantasyName(value.getAs("fantasy_name"));
-            record.setRegistrationStatus(Short.decode(value.getAs("registration_situation")));
+            record.setBasicCnpj(CnpjUtils.getString(value,"basic_cnpj"));
+            record.setCnpjOrder(CnpjUtils.getString(value,"cnpj_order"));
+            record.setCnpjCheckingDigit(CnpjUtils.getString(value,"cnpj_checking_digit"));
+            record.setMatrixBranch(CnpjUtils.getShort(value,"matrix_branch"));
+            record.setFantasyName(CnpjUtils.getString(value,"fantasy_name"));
+            record.setRegistrationStatus(CnpjUtils.getShort(value,"registration_situation"));
             record.setDateRegistrationStatus(CnpjUtils.getLocalDateAsString(value, "date_registration_situation"));
-            record.setReasonRegistrationStatus(Integer.decode(value.getAs("reason_registration_situation")));
-            record.setNameCityAbroad(value.getAs("name_city_abroad"));
-            record.setCountryCode(value.getAs("country_code"));
+            record.setReasonRegistrationStatus(Integer.decode(CnpjUtils.getString(value,"reason_registration_situation")));
+            record.setNameCityAbroad(CnpjUtils.getString(value,"name_city_abroad"));
+            record.setCountryCode(CnpjUtils.getString(value,"country_code"));
             record.setActivityStartDate(CnpjUtils.getLocalDateAsString(value, "activity_start_date"));
-            record.setMainCnaeFiscal(value.getAs("main_fiscal_cnae"));
-            record.setSecondaryCnaeFiscal(value.getAs("secondary_fiscal_cnae"));
-            record.setAddressType(value.getAs("type_of_address"));
-            record.setAddress(value.getAs("address"));
-            record.setAddressNumber(value.getAs("address_number"));
-            record.setAddressComplement(value.getAs("address_complement"));
-            record.setAddressDistrict(value.getAs("address_district"));
-            record.setZipCode(value.getAs("zip_code"));
-            record.setState(value.getAs("federation_unit"));
-            record.setCityJurisdictionCode(value.getAs("city_jurisdiction_code"));
-            record.setTelephone1AreaCode(value.getAs("telephone1_area_code"));
-            record.setTelephone1(value.getAs("telephone1"));
-            record.setTelephone2AreaCode(value.getAs("telephone2_area_code"));
-            record.setTelephone2(value.getAs("telephone2"));
-            record.setFaxAreaCode(value.getAs("fax_area_code"));
-            record.setFaxNumber(value.getAs("fax_number"));
-            record.setTaxpayerEmail(value.getAs("contributors_email"));
-            record.setSpecialSituation(value.getAs("special_situation"));
+            record.setMainCnaeFiscal(CnpjUtils.getString(value,"main_fiscal_cnae"));
+            record.setSecondaryCnaeFiscal(CnpjUtils.getString(value,"secondary_fiscal_cnae"));
+            record.setAddressType(CnpjUtils.getString(value,"type_of_address"));
+            record.setAddress(CnpjUtils.getString(value,"address"));
+            record.setAddressNumber(CnpjUtils.getString(value,"address_number"));
+            record.setAddressComplement(CnpjUtils.getString(value,"address_complement"));
+            record.setAddressDistrict(CnpjUtils.getString(value,"address_district"));
+            record.setZipCode(CnpjUtils.getString(value,"zip_code"));
+            record.setState(CnpjUtils.getString(value,"federation_unit"));
+            record.setCityJurisdictionCode(CnpjUtils.getString(value,"city_jurisdiction_code"));
+            record.setTelephone1AreaCode(CnpjUtils.getString(value,"telephone1_area_code"));
+            record.setTelephone1(CnpjUtils.getString(value,"telephone1"));
+            record.setTelephone2AreaCode(CnpjUtils.getString(value,"telephone2_area_code"));
+            record.setTelephone2(CnpjUtils.getString(value,"telephone2"));
+            record.setFaxAreaCode(CnpjUtils.getString(value,"fax_area_code"));
+            record.setFaxNumber(CnpjUtils.getString(value,"fax_number"));
+            record.setTaxpayerEmail(CnpjUtils.getString(value,"contributors_email"));
+            record.setSpecialSituation(CnpjUtils.getString(value,"special_situation"));
             record.setSpecialSituationDate(CnpjUtils.getLocalDateAsString(value, "special_situation_date"));
         }
         catch (Exception ex){

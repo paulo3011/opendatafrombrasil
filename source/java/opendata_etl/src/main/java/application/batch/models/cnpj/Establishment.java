@@ -37,7 +37,7 @@ public class Establishment extends FromTextFileModel {
      * 2 – FILIAL
      */
     @Getter @Setter
-    private short matrixBranch;
+    private Short matrixBranch;
     /**
      * FANTASY NAME (Facade Name or Corporate Brand is the popular name of a company, and may or may not be the same as its corporate name.)
      *
@@ -61,7 +61,7 @@ public class Establishment extends FromTextFileModel {
      * 08 – BAIXADA
      */
     @Getter @Setter
-    private short registrationStatus;
+    private Short registrationStatus;
     /**
      * DATE OF REGISTRATION STATUS EVENT
      *

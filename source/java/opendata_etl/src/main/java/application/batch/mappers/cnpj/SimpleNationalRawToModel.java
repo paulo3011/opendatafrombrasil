@@ -16,11 +16,11 @@ public class SimpleNationalRawToModel implements MapFunction<Row, SimpleNational
     public SimpleNational call(Row value) {
         SimpleNational record = new SimpleNational();
         try {
-            record.setBasicCnpj(value.getAs("basic_cnpj"));
-            record.setIsSimple(value.getAs("is_simple").equals("S"));
+            record.setBasicCnpj(CnpjUtils.getString(value,"basic_cnpj"));
+            record.setIsSimple(CnpjUtils.getString(value,"is_simple").equals("S"));
             record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value, "simple_option_date"));
             record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value, "simple_exclusion_date"));
-            record.setIsMei(value.getAs("is_mei").equals("S"));
+            record.setIsMei(CnpjUtils.getString(value,"is_mei").equals("S"));
             record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value, "mei_option_date"));
             record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value, "mei_exclusion_date"));
         }

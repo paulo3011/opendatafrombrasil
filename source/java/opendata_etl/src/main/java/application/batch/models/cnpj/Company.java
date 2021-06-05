@@ -54,7 +54,7 @@ public class Company extends FromTextFileModel {
      * 05 - DEMAIS
      */
     @Getter @Setter
-    private short companySize;
+    private Short companySize;
     /**
      * THE RESPONSIBLE FEDERATIVE ENTITY IS COMPLETED FOR THE CASES OF ORGANS AND ENTITIES OF THE GROUP OF LEGAL NATURE 1XXX. FOR OTHER NATURES, THIS ATTRIBUTE IS BLANK.
      *

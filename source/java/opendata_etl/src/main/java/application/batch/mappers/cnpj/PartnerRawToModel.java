@@ -10,17 +10,17 @@ public class PartnerRawToModel implements MapFunction<Row, Partner> {
     public Partner call(Row value) {
         Partner record = new Partner();
         try {
-            record.setBasicCnpj(value.getAs("basic_cnpj"));
-            record.setPartnerType(Short.decode(value.getAs("partner_type")));
-            record.setPartnerName(value.getAs("partner_name"));
-            record.setPartnerDocument(value.getAs("partner_document"));
-            record.setPartnerQualification(Short.decode(value.getAs("partner_qualification")));
+            record.setBasicCnpj(CnpjUtils.getString(value,"basic_cnpj"));
+            record.setPartnerType(Short.decode(CnpjUtils.getString(value,"partner_type")));
+            record.setPartnerName(CnpjUtils.getString(value,"partner_name"));
+            record.setPartnerDocument(CnpjUtils.getString(value,"partner_document"));
+            record.setPartnerQualification(Short.decode(CnpjUtils.getString(value,"partner_qualification")));
             record.setPartnerStartDate(CnpjUtils.getLocalDateAsString(value, "partner_start_date"));
-            record.setCountry(value.getAs("country"));
-            record.setLegalRepresentative(value.getAs("legal_representative"));
-            record.setRepresentativeName(value.getAs("representative_name"));
-            record.setRepresentativeQualification(Short.decode(value.getAs("representative_qualification")));
-            record.setAgeRange(Short.decode(value.getAs("age_range")));
+            record.setCountry(CnpjUtils.getString(value,"country"));
+            record.setLegalRepresentative(CnpjUtils.getString(value,"legal_representative"));
+            record.setRepresentativeName(CnpjUtils.getString(value,"representative_name"));
+            record.setRepresentativeQualification(Short.decode(CnpjUtils.getString(value,"representative_qualification")));
+            record.setAgeRange(Short.decode(CnpjUtils.getString(value,"age_range")));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());

@@ -17,13 +17,13 @@ public class CompanyRawToModel implements MapFunction<Row, Company> {
     public Company call(Row value) {
         Company record = new Company();
         try {
-            record.setBasicCnpj(value.getAs("basic_cnpj"));
-            record.setLegalName(value.getAs("legal_name"));
-            record.setLegalNature(value.getAs("legal_nature"));
-            record.setResponsibleQualification(value.getAs("responsible_qualification"));
+            record.setBasicCnpj(CnpjUtils.getString(value,"basic_cnpj"));
+            record.setLegalName(CnpjUtils.getString(value,"legal_name"));
+            record.setLegalNature(CnpjUtils.getString(value,"legal_nature"));
+            record.setResponsibleQualification(CnpjUtils.getString(value,"responsible_qualification"));
             record.setCompanyCapital(CnpjUtils.getBigDecimalAsString(value,"company_capital"));
-            record.setCompanySize(Short.decode(value.getAs("company_size")));
-            record.setFederatedEntityResponsible(value.getAs("federative_entity_responsible"));
+            record.setCompanySize(CnpjUtils.getShort(value, "company_size"));
+            record.setFederatedEntityResponsible(CnpjUtils.getString(value,"federative_entity_responsible"));
         }
         catch (Exception ex){
             System.out.printf("New - date parser error: %s: , row data: %s", ex.toString(), value.toString());
