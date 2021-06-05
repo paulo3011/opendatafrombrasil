@@ -4,16 +4,18 @@ import application.batch.models.cnpj.genericcodes.GenericCode;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Row;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class GenericCodeRawToModel<T extends GenericCode> implements MapFunction<Row, T> {
-    private Class<T> tClass;
+    private final Class<T> tClass;
     public GenericCodeRawToModel(final Class<T> tClass){
         this.tClass = tClass;
     }
 
     @Override
-    public T call(Row value)  {
+    public T call(Row value) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        T record = tClass.getDeclaredConstructor().newInstance();
         try {
-            T record = tClass.getDeclaredConstructor().newInstance();
 
             //note: In Java, numbers prefixed with a "0" are treated as octal.
             //java.lang.NumberFormatException: For input string: "008" under radix 8
@@ -24,7 +26,9 @@ public class GenericCodeRawToModel<T extends GenericCode> implements MapFunction
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());
-            return null;
+            record.setRawData(value.toString());
+            record.setParseErrorMessage(ex.getMessage());
         }
+        return record;
     }
 }

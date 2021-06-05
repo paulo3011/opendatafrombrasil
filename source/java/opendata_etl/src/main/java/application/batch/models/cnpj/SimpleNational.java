@@ -1,13 +1,14 @@
 package application.batch.models.cnpj;
 
+import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class SimpleNational {
+public class SimpleNational extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
      *
-     * NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).
+     * NÚMERO BASE DE INSCRICAO NO CNPJ (OITO PRIMEIROS DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String basicCnpj;

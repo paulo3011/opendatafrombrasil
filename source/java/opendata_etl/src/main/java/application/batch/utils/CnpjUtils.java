@@ -13,12 +13,11 @@ import java.util.Locale;
  */
 public class CnpjUtils {
     /**
-     * Returns the local date for the row and index using CNPJ dataset date format.
-     * @param value The Row with values
-     * @param index The Row index to get the value
+     * Returns the local date for the column value using CNPJ dataset date format.
+     * @param dateAsString The Row with values
      * @return Return null if no date were found or the LocalDate found
      */
-    public static LocalDate getLocalDate(Row value, int index) {
+    public static LocalDate getLocalDate(String dateAsString) {
         /*
         Known issues:
         file: K3241.K03200Y0.D10410.ESTABELE
@@ -29,7 +28,6 @@ public class CnpjUtils {
 
         try {
             //"yyyyMMdd"
-            String dateAsString = value.getString(index);
 
             if (dateAsString != null && !dateAsString.equals("00000000") && !dateAsString.equals("0") && Long.parseLong(dateAsString) != 0) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -37,11 +35,31 @@ public class CnpjUtils {
             }
         }
         catch (Exception ex){
-            System.out.printf("date parser error. dateAsString: %s, row data: %s", value.getString(index), value.toString());
+            System.out.printf("date parser error. dateAsString: %s", dateAsString);
             return null;
         }
 
         return date;
+    }
+
+    /**
+     * Returns the local date for the row and index using CNPJ dataset date format.
+     * @param value The Row with values
+     * @param index The Row index to get the value
+     * @return Return null if no date were found or the LocalDate found
+     */
+    public static LocalDate getLocalDate(Row value, int index) {
+        return getLocalDate(value.getString(index));
+    }
+
+    /**
+     * Returns the local date for the row and index using CNPJ dataset date format.
+     * @param value The Row with values
+     * @param filedName The Column fieldName to get the value
+     * @return Return null if no date were found or the LocalDate found
+     */
+    public static LocalDate getLocalDate(Row value, String filedName) {
+        return getLocalDate(value.getAs(filedName));
     }
 
     /**
@@ -59,6 +77,21 @@ public class CnpjUtils {
         return null;
     }
 
+    /**
+     * Returns the local date for the row and index using CNPJ dataset date format.
+     * @param value The Row with values
+     * @param fieldName The Column fieldName to get the value
+     * @return Return null if no date were found or the LocalDate found
+     */
+    public static String getLocalDateAsString(Row value, String fieldName) {
+
+        LocalDate date = getLocalDate(value, fieldName);
+        if (date != null)
+            return date.toString();
+
+        return null;
+    }
+
     public static BigDecimal getBigDecimal(Row value, int index)  {
         try {
             NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
@@ -67,6 +100,28 @@ public class CnpjUtils {
         }
         catch (Exception ex){
             return BigDecimal.ZERO;
+        }
+    }
+
+    public static BigDecimal getBigDecimal(Row value, String fieldName)  {
+        try {
+            NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+            String numberString = value.getAs(fieldName);
+            return new BigDecimal(nf.parse(numberString).toString());
+        }
+        catch (Exception ex){
+            return BigDecimal.ZERO;
+        }
+    }
+
+    public static String getBigDecimalAsString(Row value, String fieldName)  {
+        try {
+            NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+            String numberString = value.getAs(fieldName);
+            return nf.parse(numberString).toString();
+        }
+        catch (Exception ex){
+            return "0";
         }
     }
 }

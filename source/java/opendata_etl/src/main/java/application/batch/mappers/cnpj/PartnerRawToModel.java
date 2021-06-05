@@ -8,26 +8,25 @@ import org.apache.spark.sql.Row;
 public class PartnerRawToModel implements MapFunction<Row, Partner> {
     @Override
     public Partner call(Row value) {
+        Partner record = new Partner();
         try {
-            Partner record = new Partner();
-
-            record.setBasicCnpj(value.getAs(0));
-            record.setPartnerType(Short.decode(value.getAs(1)));
-            record.setPartnerName(value.getAs(2));
-            record.setPartnerDocument(value.getAs(3));
-            record.setPartnerQualification(Short.decode(value.getAs(4)));
-            record.setPartnerStartDate(CnpjUtils.getLocalDateAsString(value, 5));
-            record.setCountry(value.getAs(6));
-            record.setLegalRepresentative(value.getAs(7));
-            record.setRepresentativeName(value.getAs(8));
-            record.setRepresentativeQualification(Short.decode(value.getAs(9)));
-            record.setAgeRange(Short.decode(value.getAs(10)));
-
-            return record;
+            record.setBasicCnpj(value.getAs("basic_cnpj"));
+            record.setPartnerType(Short.decode(value.getAs("partner_type")));
+            record.setPartnerName(value.getAs("partner_name"));
+            record.setPartnerDocument(value.getAs("partner_document"));
+            record.setPartnerQualification(Short.decode(value.getAs("partner_qualification")));
+            record.setPartnerStartDate(CnpjUtils.getLocalDateAsString(value, "partner_start_date"));
+            record.setCountry(value.getAs("country"));
+            record.setLegalRepresentative(value.getAs("legal_representative"));
+            record.setRepresentativeName(value.getAs("representative_name"));
+            record.setRepresentativeQualification(Short.decode(value.getAs("representative_qualification")));
+            record.setAgeRange(Short.decode(value.getAs("age_range")));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());
-            return null;
+            record.setRawData(value.toString());
+            record.setParseErrorMessage(ex.getMessage());
         }
+        return record;
     }
 }

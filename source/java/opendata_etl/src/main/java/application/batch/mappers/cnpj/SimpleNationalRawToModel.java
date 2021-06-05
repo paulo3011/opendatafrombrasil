@@ -14,20 +14,21 @@ public class SimpleNationalRawToModel implements MapFunction<Row, SimpleNational
 
     @Override
     public SimpleNational call(Row value) {
+        SimpleNational record = new SimpleNational();
         try {
-            SimpleNational record = new SimpleNational();
-            record.setBasicCnpj(value.getAs(0));
-            record.setIsSimple(value.getAs(1).equals("S"));
-            record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value, 2));
-            record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value, 3));
-            record.setIsMei(value.getAs(4).equals("S"));
-            record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value, 5));
-            record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value, 6));
-            return record;
+            record.setBasicCnpj(value.getAs("basic_cnpj"));
+            record.setIsSimple(value.getAs("is_simple").equals("S"));
+            record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value, "simple_option_date"));
+            record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value, "simple_exclusion_date"));
+            record.setIsMei(value.getAs("is_mei").equals("S"));
+            record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value, "mei_option_date"));
+            record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value, "mei_exclusion_date"));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());
-            return null;
+            record.setRawData(value.toString());
+            record.setParseErrorMessage(ex.getMessage());
         }
+        return record;
     }
 }

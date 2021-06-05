@@ -1,11 +1,10 @@
 package application.batch.models.cnpj;
 
+import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
-public class Company {
+public class Company extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
      *
@@ -40,7 +39,7 @@ public class Company {
      * CAPITAL SOCIAL DA EMPRESA
      */
     @Getter @Setter
-    private BigDecimal companyCapital;
+    private String companyCapital;
     /**
      * COMPANY PORT CODE:
      * 1  - NOT INFORMED

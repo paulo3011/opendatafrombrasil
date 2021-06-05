@@ -8,9 +8,10 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class App {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         System.out.println("Starting app program..");
         Parameters parameters = new Parameters(args);
 

@@ -1,28 +1,29 @@
 package application.batch.models.cnpj;
 
 
+import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Establishment {
+public class Establishment extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
      *
-     * NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).
+     * NUMERO BASE DE INSCRICAO NO CNPJ (OITO PRIMEIROS DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String basicCnpj;
     /**
      * NUMBER OF THE ESTABLISHMENT OF REGISTRATION WITH THE CNPJ (FROM THE NINTH TO THE TWELFTH DIGIT OF THE CNPJ).
      *
-     * NÚMERO DO ESTABELECIMENTO DE INSCRIÇÃO NO CNPJ (DO NONO ATÉ O DÉCIMO SEGUNDO DÍGITO DO CNPJ).
+     * NUMERO DO ESTABELECIMENTO DE INSCRICAO NO CNPJ (DO NONO ATÉ O DÉCIMO SEGUNDO DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String cnpjOrder;
     /**
      * VERIFYING DIGIT OF THE CNPJ REGISTRATION NUMBER (LAST TWO DIGITS OF THE CNPJ).
      *
-     * DÍGITO VERIFICADOR DO NÚMERO DE INSCRIÇÃO NO CNPJ (DOIS ÚLTIMOS DÍGITOS DO CNPJ).
+     * DIGITOS VERIFICADOR DO NUMERO DE INSCRICAO NO CNPJ (DOIS ÚLTIMOS DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String cnpjCheckingDigit;
@@ -31,7 +32,7 @@ public class Establishment {
      * 1 - MATRIX
      * 2 – BRANCH
      *
-     * CÓDIGO DO IDENTIFICADOR MATRIZ/FILIAL:
+     * CODIGO DO IDENTIFICADOR MATRIZ/FILIAL:
      * 1 – MATRIZ
      * 2 – FILIAL
      */
@@ -52,7 +53,7 @@ public class Establishment {
      * 4 – UNABLE
      * 08 – CLOSED
      *
-     * CÓDIGO DA SITUAÇÃO CADASTRAL:
+     * CODIGO DA SITUAÇÃO CADASTRAL:
      * 01 – NULA
      * 2 – ATIVA
      * 3 – SUSPENSA
@@ -71,7 +72,7 @@ public class Establishment {
     /**
      * CODE OF REASON FOR REGISTRATION STATUS
      *
-     * CÓDIGO DO MOTIVO DA SITUAÇÃO CADASTRAL
+     * CODIGO DO MOTIVO DA SITUAÇÃO CADASTRAL
      */
     @Getter @Setter
     private int reasonRegistrationStatus;
@@ -85,28 +86,28 @@ public class Establishment {
     /**
      * COUNTRY CODE
      *
-     * CÓDIGO DO PAIS
+     * CODIGO DO PAIS
      */
     @Getter @Setter
     private String countryCode;
     /**
      * START DATE OF ACTIVITY
      *
-     * DATA DE INÍCIO DA ATIVIDADE
+     * DATA DE INICIO DA ATIVIDADE
      */
     @Getter @Setter
     private String activityStartDate;
     /**
      * CODE OF THE MAIN ECONOMIC ACTIVITY OF THE ESTABLISHMENT
      *
-     * CÓDIGO DA ATIVIDADE ECONÔMICA PRINCIPAL DO ESTABELECIMENTO
+     * CODIGO DA ATIVIDADE ECONOMICA PRINCIPAL DO ESTABELECIMENTO
      */
     @Getter @Setter
     private String mainCnaeFiscal;
     /**
      * CODE OF THE SECONDARY ECONOMIC ACTIVITY(S) OF THE ESTABLISHMENT
      *
-     * CÓDIGO DA(S) ATIVIDADE(S) ECONÔMICA(S) SECUNDÁRIA(S) DO ESTABELECIMENTO
+     * CODIGO DA(S) ATIVIDADE(S) ECONOMICA(S) SECUNDARIA(S) DO ESTABELECIMENTO
      */
     @Getter @Setter
     private String secondaryCnaeFiscal;
@@ -146,7 +147,7 @@ public class Establishment {
     /**
      * ZIP CODE
      *
-     * CÓDIGO DE ENDEREÇAMENTO POSTAL
+     * CODIGO DE ENDEREÇAMENTO POSTAL
      */
     @Getter @Setter
     private String zipCode;
@@ -158,7 +159,7 @@ public class Establishment {
     private String state;
     /**
      * CITY CODE
-     * CÓDIGO DO MUNICÍPIO DE JURISDIÇÃO ONDE SE ENCONTRA O ESTABELECIMENTO (NÃO É O CÓDIGO DO IBGE)
+     * CODIGO DO MUNICIPIO DE JURISDIÇÃO ONDE SE ENCONTRA O ESTABELECIMENTO (NAO É O CODIGO DO IBGE)
      */
     @Getter @Setter
     private String cityJurisdictionCode;

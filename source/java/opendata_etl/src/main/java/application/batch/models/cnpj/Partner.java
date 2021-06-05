@@ -1,5 +1,6 @@
 package application.batch.models.cnpj;
 
+import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,11 +9,11 @@ import lombok.Setter;
  *
  * Sócio
  */
-public class Partner {
+public class Partner extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
      *
-     * NÚMERO BASE DE INSCRIÇÃO NO CNPJ (OITO PRIMEIROS DÍGITOS DO CNPJ).
+     * NÚMERO BASE DE INSCRICAO NO CNPJ (OITO PRIMEIROS DIGITOS DO CNPJ).
      */
     @Getter @Setter
     private String basicCnpj;
@@ -22,9 +23,9 @@ public class Partner {
      * 2 - INDIVIDUAL
      * 3 – FOREIGN
      *
-     * CÓDIGO DO IDENTIFICADOR DE SÓCIO
-     * 1 – PESSOA JURÍDICA
-     * 2 – PESSOA FÍSICA
+     * CODIGO DO IDENTIFICADOR DE SÓCIO
+     * 1 – PESSOA JURIDICA
+     * 2 – PESSOA FISICA
      * 3 – ESTRANGEIRO
      */
     @Getter @Setter
@@ -35,8 +36,8 @@ public class Partner {
      * COMPANY OF THE LEGAL ENTITY AND/OR NAME OF THE
      * PARTNER/CORPORATE NAME OF THE FOREIGN PARTNER
      *
-     * NOME DO SÓCIO PESSOA FÍSICA OU A RAZÃO SOCIAL E/OU NOME
-     * EMPRESARIAL DA PESSOA JURÍDICA E/OU NOME DO
+     * NOME DO SÓCIO PESSOA FISICA OU A RAZÃO SOCIAL E/OU NOME
+     * EMPRESARIAL DA PESSOA JURIDICA E/OU NOME DO
      * SÓCIO/RAZÃO SOCIAL DO SÓCIO ESTRANGEIRO
      */
     @Getter @Setter
@@ -51,7 +52,7 @@ public class Partner {
     /**
      * MEMBER QUALIFICATION CODE
      *
-     * CÓDIGO DA QUALIFICAÇÃO DO SÓCIO
+     * CODIGO DA QUALIFICAÇÃO DO SÓCIO
      */
     @Getter @Setter
     private short partnerQualification;
@@ -65,7 +66,7 @@ public class Partner {
     /**
      * COUNTRY CODE OF FOREIGN PARTNER
      *
-     * CÓDIGO PAÍS DO SÓCIO ESTRANGEIRO
+     * CODIGO PAIS DO SÓCIO ESTRANGEIRO
      */
     @Getter @Setter
     private String country;
@@ -86,14 +87,14 @@ public class Partner {
     /**
      * LEGAL REPRESENTATIVE QUALIFICATION CODE
      *
-     * CÓDIGO DA QUALIFICAÇÃO DO REPRESENTANTE LEGAL
+     * CODIGO DA QUALIFICAÇÃO DO REPRESENTANTE LEGAL
      */
     @Getter @Setter
     private short representativeQualification;
     /**
      * CODE CORRESPONDING TO THE AGE RANGE OF THE MEMBER
      *
-     * CÓDIGO CORRESPONDENTE À FAIXA ETÁRIA DO SÓCIO
+     * CODIGO CORRESPONDENTE A FAIXA ETARIA DO SÓCIO
      */
     @Getter @Setter
     private short ageRange;
