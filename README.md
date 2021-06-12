@@ -166,12 +166,60 @@ Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os ca
 
 </br>
 
-__Dados complementares IBGE__
+### __Problemas conhecidos nos dados e como tratar__
 
-__Códigos municípios segundo IBGE__
+__Datas em formato inválidos__
 
-Fonte: ftp://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2020/DTB_2020_v2.zip
-Disponibilizado em: https://www.ibge.gov.br/explica/codigos-dos-municipios.php
+Arquivos de estabelecimentos
+
+Arquivo: K3241.K03200Y0.D10410.ESTABELE
+Campo: Data situação cadastral
+Valor: 0
+
+```txt
+"30005475";"0001";"31";"1";"";"2";"0";"0";"";"";"20180322";"6204000";"6209100,7490104";"AVENIDA";"PAULISTA";"2202";"CONJ  54-B";"BELA VISTA";"01310300";"SP";"7107";"11";"59085410";"";"";"";"";"CEFISCO@UOL.COM.BR";"";""
+```
+
+Arquivo: [pendente de identificar arquivo origem]
+Campo: Data situação cadastral
+Valor: 4100813
+
+```txt
+"18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
+```
+
+Cuidados necessários:
+
+- Foi encontrado registros com caracteres que quebram o parser padrão do apache spark utilizando DataFrameReader como "\" que é o caracter de scape default. Foi preciso implementar uma leitura dos csv's customizada para evitar que as colunas dos arquivos ficassem quebradas (com mais ou menos colunas). 
+
+- Cuidar com campos que podem ser nulos e avaliar se o campo contém valores como: null ou embranco ("")
+
+```Java
+public static String fixStringValues(String value) {
+        if (value == null || value.equals("null"))
+            return null;
+        return value.replaceAll("^\"|\"$", "");
+    }
+```
+
+- Foi preciso tratar valores numéricos (inteiros) que continham zeros a esquerda, exemplo: 0001. Nestes casos foi removido os zeros das esquerda antes de converter para inteiro. Além disso foi preciso verificar por valores nulos, vazios antes de tentar converter.
+
+- Para converter valores monetários foi preciso utilizar formatação local do brasil
+
+```Java
+//exemplo
+public static String fixStringValues(String value) {
+    if (value == null || value.equals("null"))
+        return null;
+    return value.replaceAll("^\"|\"$", "");
+}
+NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+String numberString = fixStringValues("000000010000,00");
+return nf.parse(numberString).toString();
+```
+
+- Datas inválidas foram tratadas como nulas
+
 
 ## 3. Definir o modelo de dados
 
