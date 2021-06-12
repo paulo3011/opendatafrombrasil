@@ -192,10 +192,10 @@ __Problema:__ Formato inválido
 ```txt
 "18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
 ```
+<br/>
 
 ### __Cuidados necessários__
 <br/>
-
 
 - Foi encontrado registros com caracteres que quebram o parser padrão do apache spark utilizando DataFrameReader como "\" que é o caracter de scape default. Foi preciso implementar uma leitura dos csv's customizada para evitar que as colunas dos arquivos ficassem quebradas (com mais ou menos colunas). 
 
