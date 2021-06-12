@@ -167,28 +167,35 @@ Deve ser preenchido com cada ocorrência sendo separada por vírgula, para os ca
 </br>
 
 ### __Problemas conhecidos nos dados e como tratar__
+<br/>
 
-__Datas em formato inválidos__
+__Arquivo:__ K3241.K03200Y0.D10410.ESTABELE
 
-Arquivos de estabelecimentos
+__Campo:__ Data situação cadastral
 
-Arquivo: K3241.K03200Y0.D10410.ESTABELE
-Campo: Data situação cadastral
-Valor: 0
+__Valor:__ 0
+
+__Problema:__ Formato inválido
 
 ```txt
 "30005475";"0001";"31";"1";"";"2";"0";"0";"";"";"20180322";"6204000";"6209100,7490104";"AVENIDA";"PAULISTA";"2202";"CONJ  54-B";"BELA VISTA";"01310300";"SP";"7107";"11";"59085410";"";"";"";"";"CEFISCO@UOL.COM.BR";"";""
 ```
 
-Arquivo: [pendente de identificar arquivo origem]
-Campo: Data situação cadastral
-Valor: 4100813
+__Arquivo:__ [pendente de identificar arquivo origem]
+
+__Campo:__ Data situação cadastral
+
+__Valor:__ 4100813
+
+__Problema:__ Formato inválido
 
 ```txt
 "18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
 ```
 
-Cuidados necessários:
+### __Cuidados necessários__
+<br/>
+
 
 - Foi encontrado registros com caracteres que quebram o parser padrão do apache spark utilizando DataFrameReader como "\" que é o caracter de scape default. Foi preciso implementar uma leitura dos csv's customizada para evitar que as colunas dos arquivos ficassem quebradas (com mais ou menos colunas). 
 
