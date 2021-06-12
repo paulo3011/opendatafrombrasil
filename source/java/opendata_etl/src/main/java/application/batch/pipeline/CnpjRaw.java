@@ -4,29 +4,29 @@ import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
 import application.batch.mappers.cnpj.*;
-import application.batch.models.FromTextFileModel;
 import application.batch.models.args.Parameters;
 import application.batch.models.cnpj.Company;
 import application.batch.models.cnpj.Establishment;
 import application.batch.models.cnpj.Partner;
 import application.batch.models.cnpj.SimpleNational;
 import application.batch.models.cnpj.genericcodes.*;
-import application.batch.schemes.cnpj.CompanySchema;
-import application.batch.schemes.cnpj.EstablishmentSchema;
-import application.batch.schemes.cnpj.PartnerSchema;
-import application.batch.schemes.cnpj.SimpleNationalSchema;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructType;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CnpjRaw implements IPipeline {
 
     //#region constants
@@ -115,26 +115,30 @@ public class CnpjRaw implements IPipeline {
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters)
-            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            throws ReflectiveOperationException {
         //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
         //parameters.setOutputFileFormat(FileFormat.orc);
 
         //this.loadTest(sparkSession);
-        this.analyzeRawData(sparkSession, parameters);
 
-        //runTransformation(sparkSession,parameters,true);
+        //this.analyzeRawData(sparkSession, parameters);
+
+        runTransformation(sparkSession,parameters,true);
+
+
     }
 
     @SuppressWarnings("unused")
     private void analyzeRawData(SparkSession sparkSession, Parameters parameters)
-            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException
-    {
-        this.analyzeRawData(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsRawToModel.class, Establishment.class, EstablishmentSchema.getSchema());
-        this.analyzeRawData(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyRawToModel.class, Company.class, CompanySchema.getSchema());
-        this.analyzeRawData(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalRawToModel.class, SimpleNational.class, SimpleNationalSchema.getSchema());
-        this.analyzeRawData(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerRawToModel.class, Partner.class, PartnerSchema.getSchema());
+            throws ReflectiveOperationException {
+        //this.analyzeRawData(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsRawToModel.class, Establishment.class, EstablishmentSchema.getSchema());
+        this.analyzeRawData2(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsStringRawToModel.class, Establishment.class, true);
+        this.analyzeRawData2(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, true);
+        this.analyzeRawData2(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalStringRawToModel.class, SimpleNational.class, true);
+        this.analyzeRawData2(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerStringRawToModel.class, Partner.class, true);
     }
 
     /**
@@ -163,11 +167,7 @@ public class CnpjRaw implements IPipeline {
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
     {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, pathGlobFilter, defautFolder, true, schema);
-        debugDataSet(sourceDf);
         Dataset<T> dataset = sourceDf.map(mapperClass.getDeclaredConstructor().newInstance(), Encoders.bean(modelClass)).cache();
-
-        debugDataSet(dataset);
-
         Dataset<T> datasetOfErrors = dataset.filter(dataset.col("rawData").isNotNull()).cache();
 
         debugDataSet(datasetOfErrors);
@@ -176,6 +176,109 @@ public class CnpjRaw implements IPipeline {
         String outputPath = Paths.get(parameters.getInputPath(), OUTPUT_FOLDER_FOR_RAW_ANALYSE, defautFolder).toString();
         dfWriter.save(outputPath);
     }
+
+    /**
+     * Analyze the raw data from the file and saves an output file with errors found.
+     * @param sparkSession Spark session
+     * @param parameters App params
+     * @param pathGlobFilter glob filter
+     * @param defautFolder defaut folder to save files
+     * @param mapperClass mapper to transform raw data to model
+     * @param modelClass target model class for the mapper
+     * @param <T> Model type
+     * @param <U> Mapper type
+     * @throws NoSuchMethodException NoSuchMethodException
+     * @throws IllegalAccessException IllegalAccessException
+     * @throws InvocationTargetException InvocationTargetException
+     * @throws InstantiationException InstantiationException
+     */
+    private <T, U extends FlatMapFunction<Iterator<String>, T>> void analyzeRawData2(
+            SparkSession sparkSession,
+            Parameters parameters,
+            String pathGlobFilter,
+            String defautFolder,
+            final Class<U> mapperClass,
+            final Class<T> modelClass,
+            boolean cache)
+            throws ReflectiveOperationException {
+
+        Dataset<Row> dataset  = this.getDataFrame(sparkSession, parameters, pathGlobFilter, defautFolder, mapperClass, modelClass, cache);
+        Dataset<Row> datasetOfErrors = dataset.filter(dataset.col("rawData").isNotNull()).cache();
+
+        debugDataSet(datasetOfErrors);
+
+        DataFrameWriter<Row> dfWriter = getDataFrameWriter(datasetOfErrors, parameters);
+        String outputPath = Paths.get(parameters.getInputPath(), OUTPUT_FOLDER_FOR_RAW_ANALYSE, defautFolder).toString();
+        dfWriter.save(outputPath);
+    }
+
+    /**
+     * Read input files and return a dataframe
+     * @param sparkSession Spark session
+     * @param parameters App params
+     * @param pathGlobFilter glob filter to filter files to read
+     * @param defautFolder defaut folder to read files
+     * @param mapperClass mapper to transform raw data to model
+     * @param modelClass target model class for the mapper
+     * @param cache If true cache the dataframe
+     * @param <T> Model type
+     * @param <U> Mapper type
+     * @throws ReflectiveOperationException ReflectiveOperationException
+     * @see <a href="https://spark.apache.org/docs/latest/rdd-programming-guide.html">textfile options</a>
+     */
+    private <T, U extends FlatMapFunction<Iterator<String>, T>> Dataset<Row> getDataFrame(
+            SparkSession sparkSession,
+            Parameters parameters,
+            String pathGlobFilter,
+            String defautFolder,
+            final Class<U> mapperClass,
+            final Class<T> modelClass,
+            boolean cache)
+            throws ReflectiveOperationException
+    {
+        JavaSparkContext sparkContext = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+        /*
+        Rules:
+        1. If input file format == csv (original raw format) then all files needs to be in the same folder (original organization)
+        2. If input file format != csv then all files needs to ben in the default output folder (default name)
+        */
+        FileFormat inputFormat = parameters.getInputFileFormat();
+
+        Path inputPath = Paths.get(parameters.getInputPath());
+        if (inputFormat != FileFormat.csv){
+            inputPath = Paths.get(parameters.getInputPath(), defautFolder);
+            pathGlobFilter = null;
+        }
+
+        String path = inputPath.toString();
+
+        if(pathGlobFilter != null){
+            path = inputPath.toString() + File.separator + pathGlobFilter;
+        }
+
+        /*
+        If using a path on the local filesystem, the file must also be accessible at the same path on worker nodes.
+        Either copy the file to all workers or use a network-mounted shared file system.
+
+        All of Spark’s file-based input methods, including textFile, support running on directories, compressed files,
+        and wildcards as well. For example, you can use textFile("/my/directory"), textFile("/my/directory/*.txt"), and textFile("/my/directory/*.gz").
+
+        The textFile method also takes an optional second argument for controlling the number of partitions of the file.
+        By default, Spark creates one partition for each block of the file (blocks being 128MB by default in HDFS),
+        but you can also ask for a higher number of partitions by passing a larger value. Note that you cannot have fewer partitions than blocks.
+         */
+        JavaRDD<String> csvLines = sparkContext.textFile(path);
+        JavaRDD<T> est = csvLines.mapPartitions(mapperClass.getDeclaredConstructor().newInstance());
+        //List<T> list = est.collect();
+
+        Dataset<Row> df = sparkSession.createDataFrame(est, modelClass);
+
+        if(cache)
+            df = df.cache();
+
+        return df;
+    }
+
 
     @SuppressWarnings("unused")
     private <T> void debugDataSet(Dataset<T> ds) {
@@ -188,30 +291,16 @@ public class CnpjRaw implements IPipeline {
 
     @SuppressWarnings("unused")
     public void loadTest(SparkSession sparkSession){
-        DataFrameReader reader = sparkSession.read()
-                .schema(CompanySchema.getSchema())
-                .format("csv")
-                .option("inferSchema", "false")
-                .option("header", "false")
-                .option("sep",";")
-                .option("encoding","ISO-8859-1")
-                .option("unescapedQuoteHandling","STOP_AT_DELIMITER")
-                .option("quote", "")// turn off quotations to handle manually
-                ;
+        String path = "E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\K3241.K03200Y9.D10410.ESTABELE";
 
-        Dataset<Row> df1 = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\K3241.K03200Y0.D10410.ESTABELE").cache();
-        Object filtered = df1.filter(df1.col("basic_cnpj").equalTo("20100518")).take(1);
-        //Object ldf1 = df1.take(4);
-        this.debugDataSet(df1);
-        Dataset<Establishment> dfc1 = df1.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
-        Object r1 = dfc1.collect();
-        this.debugDataSet(dfc1);
+        //JavaRDD do not extends scala RDD
+        JavaSparkContext sparkContext = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+        JavaRDD<String> csvLines = sparkContext.textFile(path);
 
-        Dataset<Row> df = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\K3241.K03200Y0.D10410.EMPRECSV").cache();
-        this.debugDataSet(df);
-        Dataset<Company> dfc = df.map(new CompanyRawToModel(), Encoders.bean(Company.class));
-        Object r = dfc.collect();
-        this.debugDataSet(dfc);
+        JavaRDD<Establishment> est = csvLines.mapPartitions(new EstablishmentsStringRawToModel());
+        List<Establishment> list = est.collect();
+        Dataset<Row> df = sparkSession.createDataFrame(est,Establishment.class);
+        debugDataSet(df);
     }
 
     /**
@@ -272,8 +361,8 @@ public class CnpjRaw implements IPipeline {
                 .option("encoding","ISO-8859-1")
                 .option("mode","PERMISSIVE")
                 .option("columnNameOfCorruptRecord","rawData")
-                .option("unescapedQuoteHandling","STOP_AT_DELIMITER")
-                .option("quote", "")// turn off quotations to handle manually
+                //.option("unescapedQuoteHandling","STOP_AT_DELIMITER")
+                //.option("quote", "")// turn off quotations to handle manually
                 ;
 
         if(pathGlobFilter != null)
@@ -331,7 +420,7 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
+    public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         runGenericCodeTransformation(sparkSession,parameters,cache);
         runPartnerTransformation(sparkSession,parameters,cache);
         runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
@@ -344,9 +433,8 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, cache, SimpleNationalSchema.getSchema());
-        //debugDataSet(sourceDf);
+    public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalStringRawToModel.class, SimpleNational.class, cache);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -357,10 +445,7 @@ public class CnpjRaw implements IPipeline {
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
-            //debugDataSet(simpleNationalDataset);
-            //transform to lake model
-            Dataset<SimpleNational> dataset = sourceDf.map(new SimpleNationalRawToModel(), Encoders.bean(SimpleNational.class));
-            DataFrameWriter<SimpleNational> dfWriter = getDataFrameWriter(dataset, parameters);
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), SIMPLE_NATIONAL_FOLDER).toString());
         }
     }
@@ -371,9 +456,10 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, cache, EstablishmentSchema.getSchema());
-        Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, cache, CompanySchema.getSchema());
+    public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsStringRawToModel.class, Establishment.class, cache);
+
+        Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, cache);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -388,30 +474,23 @@ public class CnpjRaw implements IPipeline {
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
             //transform to lake model
-            Dataset<Establishment> establishmentDataset = sourceDf.map(new EstablishmentsRawToModel(), Encoders.bean(Establishment.class));
-            debugDataSet(establishmentDataset);
-
-            DataFrameWriter<Establishment> dfWriter = getDataFrameWriter(establishmentDataset, parameters);
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
 
             //transform to lake model
-            Dataset<Company> companyDataset = companySourceDf.map(new CompanyRawToModel(), Encoders.bean(Company.class));
-
-            debugDataSet(companyDataset);
-
-            DataFrameWriter<Company> companyDfWriter = getDataFrameWriter(companyDataset, parameters);
+            DataFrameWriter<Row> companyDfWriter = getDataFrameWriter(companySourceDf, parameters);
             companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
 
+            /*
             //Unify establishment and company dataframes
             ArrayList<String> columns = new ArrayList<>();
             columns.add("basicCnpj");
-            Dataset<Row> newEstablismentDf = FromTextFileModel.dropDebugColumns(establishmentDataset);
-            Dataset<Row> joinedDs = newEstablismentDf.join(FromTextFileModel.dropDebugColumns(companyDataset), convertListToSeq(columns), "left");
-
-            debugDataSet(joinedDs);
+            Dataset<Row> newEstablismentDf = FromTextFileModel.dropDebugColumns(sourceDf);
+            Dataset<Row> joinedDs = newEstablismentDf.join(FromTextFileModel.dropDebugColumns(companySourceDf), convertListToSeq(columns), "left");
 
             DataFrameWriter<Row> joinedDsDfWriter = getDataFrameWriter(joinedDs, parameters);
             joinedDsDfWriter.save(Paths.get(parameters.getInputPath(), FULL_COMPANY_FOLDER).toString());
+            */
         }
     }
 
@@ -421,8 +500,8 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runPartnerTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, cache, PartnerSchema.getSchema());
+    public void runPartnerTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerStringRawToModel.class, Partner.class, cache);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -433,9 +512,7 @@ public class CnpjRaw implements IPipeline {
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
-            //transform to lake model
-            Dataset<Partner> dataset = sourceDf.map(new PartnerRawToModel(), Encoders.bean(Partner.class));
-            DataFrameWriter<Partner> dfWriter = getDataFrameWriter(dataset, parameters);
+            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_FOLDER).toString());
         }
     }

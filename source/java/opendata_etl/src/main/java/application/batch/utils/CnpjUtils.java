@@ -34,7 +34,7 @@ public class CnpjUtils {
 
         try {
             //"yyyyMMdd"
-
+            dateAsString = fixStringValues(dateAsString);
             if (dateAsString != null && !dateAsString.isEmpty() && !dateAsString.equals("00000000") && !dateAsString.equals("0")) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                 date = LocalDate.parse(dateAsString, formatter);
@@ -42,10 +42,14 @@ public class CnpjUtils {
         }
         catch (Exception ex){
             System.out.printf("date parser error. dateAsString: %s fieldName: %s \n", dateAsString, fieldName);
-            return null;
+            throw ex;
         }
 
         return date;
+    }
+
+    public static LocalDate getLocalDate(String dateAsString) {
+        return getLocalDate(dateAsString,null);
     }
 
     /**
@@ -67,6 +71,15 @@ public class CnpjUtils {
     public static String getLocalDateAsString(Row value, String fieldName) {
 
         LocalDate date = getLocalDate(value, fieldName);
+        if (date != null)
+            return date.toString();
+
+        return null;
+    }
+
+    public static String getLocalDateAsString(String value) {
+
+        LocalDate date = getLocalDate(value);
         if (date != null)
             return date.toString();
 
@@ -95,6 +108,17 @@ public class CnpjUtils {
         }
     }
 
+    public static String getBigDecimalAsString(String value)  {
+        try {
+            NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+            String numberString = fixStringValues(value);
+            return nf.parse(numberString).toString();
+        }
+        catch (Exception ex){
+            return "0";
+        }
+    }
+
     public static Short getShort(Row value, String fieldName) {
         try {
             String numberString = getString(value, fieldName);
@@ -107,10 +131,50 @@ public class CnpjUtils {
         }
     }
 
+    public static Short getShort(String numberString) {
+        try {
+            numberString = fixStringValues(numberString);
+
+            if (numberString == null || numberString.equals("null") || numberString.equals(""))
+                return null;
+            return Short.decode(numberString);
+        }
+        catch (Exception ex){
+            return null;
+        }
+    }
+
+    public static Integer getInteger(String numberString){
+        String regexStr = "^0+(?!$)";
+        numberString = fixStringValues(numberString);
+
+        if(numberString == null)
+            return null;
+
+        return Integer.parseInt(numberString.replaceFirst(regexStr,""));
+    }
+
     public static String getString(Row value, String fieldName) {
         String text = value.getAs(fieldName);
         if (text == null || text.equals("null"))
             return null;
         return text.replaceAll("^\"|\"$", "");
+    }
+
+    public static String fixStringValues(String value) {
+        if (value == null || value.equals("null"))
+            return null;
+        return value.replaceAll("^\"|\"$", "");
+    }
+
+    public static String[] splitTextLine(String textLine){
+        if(textLine.startsWith("\""))
+            textLine = textLine.substring(1);
+        if(textLine.endsWith("\""))
+            textLine = textLine.substring(0, textLine.length()-1);
+
+        String[] parts = textLine.split("\";\"",-1);
+        //System.out.printf("parts.length: %s \n", parts.length);
+        return parts;
     }
 }

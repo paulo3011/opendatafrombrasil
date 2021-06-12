@@ -7,5 +7,5 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public interface IPipeline {
-    void Start(SparkSession sparkSession, Parameters parameters) throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;
+    void Start(SparkSession sparkSession, Parameters parameters) throws IOException, ReflectiveOperationException;
 }

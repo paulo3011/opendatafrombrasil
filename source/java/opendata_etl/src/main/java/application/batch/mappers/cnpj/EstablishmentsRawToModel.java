@@ -5,6 +5,7 @@ import application.batch.utils.CnpjUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Row;
 
+@SuppressWarnings("unused")
 public class EstablishmentsRawToModel implements MapFunction<Row, Establishment> {
     @Override
     public Establishment call(Row value) {

@@ -5,7 +5,9 @@ import lombok.Setter;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-public class FromTextFileModel  {
+import java.io.Serializable;
+
+public class FromTextFileModel implements Serializable {
     /**
      * Raw data with error during parse.
      */
