@@ -192,6 +192,19 @@ __Problema:__ Formato inválido
 ```txt
 "18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
 ```
+
+__Arquivo:__ K3241.K03200Y0.D10410.ESTABELE
+
+__Campo:__ Data situação cadastral
+
+__Valor:__ 4100813
+
+__Problema:__ Complemento "EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805" tem ponto e vírgula que é o separador do arquivo e dependendo do parser de csv que estiver sendo usado ele se perde e bagunça as colunas.
+
+```txt
+"36452531";"0001";"62";"1";"AMPPLA CREATIVE STUDIO";"2";"20200221";"0";"";"";"20200221";"1821100";"5819100,5811500,5812302,1813001,5912099,5812301,7319002,5813100";"ESTRADA";"DO MANDU";"560";"EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805";"SAO MARCOS";"41250400";"BA";"3849";"71";"99479533";"";"";"";"";"JONATASMA@GMAIL.COM";"";""
+```
+
 <br/>
 
 ### __Cuidados necessários__
