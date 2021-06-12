@@ -29,6 +29,8 @@ public class CnpjUtils {
         line: "36451356","0001","99","1","BROCADUS DELIVERY","2","20200221","0","","","20200221","5611203","","RUA","RIO JAPURA","169","LETRA A","PERPETUO SOCORRO","68905540","AP","605","96","84110818","","","","","DENISEBALIEIRO@HOTMAIL.COM","",""
         empty date value: "" (SpecialSituationDate - last column)
 
+        line: "18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
+        wrong date value: 4100813
          */
         LocalDate date = null;
 
@@ -42,7 +44,7 @@ public class CnpjUtils {
         }
         catch (Exception ex){
             System.out.printf("date parser error. dateAsString: %s fieldName: %s \n", dateAsString, fieldName);
-            throw ex;
+            //Don't throw exception because there is wrong values like 4100813
         }
 
         return date;
@@ -173,8 +175,7 @@ public class CnpjUtils {
         if(textLine.endsWith("\""))
             textLine = textLine.substring(0, textLine.length()-1);
 
-        String[] parts = textLine.split("\";\"",-1);
         //System.out.printf("parts.length: %s \n", parts.length);
-        return parts;
+        return textLine.split("\";\"",-1);
     }
 }
