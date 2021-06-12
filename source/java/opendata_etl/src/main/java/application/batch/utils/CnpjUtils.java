@@ -11,6 +11,7 @@ import java.util.Locale;
 /**
  * CNPJ dataset utils class.
  */
+@SuppressWarnings("unused")
 public class CnpjUtils {
     /**
      * Returns the local date for the column value using CNPJ dataset date format.

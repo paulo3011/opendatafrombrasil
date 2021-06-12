@@ -124,20 +124,4 @@ public class ParseCsvTest {
         Assert.assertEquals("11", "00011".replaceFirst(regexStr,""));
         Assert.assertEquals("11", "11".replaceFirst(regexStr,""));
     }
-
-    public static String removeLeadingZeroes(String str)
-    {
-        if(Double.parseDouble(str)==0)
-            return new String("0");
-        else
-        {
-            int i=0;
-            for(i=0; i<str.length(); i++)
-            {
-                if(str.charAt(i)!='0')
-                    break;
-            }
-            return str.substring(i, str.length());
-        }
-    }
 }
