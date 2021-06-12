@@ -210,7 +210,7 @@ __Problema:__ Complemento "EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805" tem ponto e 
 ### __Cuidados necessários__
 <br/>
 
-- Foi encontrado registros com caracteres que quebram o parser padrão do apache spark utilizando DataFrameReader como "\" que é o caracter de scape default. Foi preciso implementar uma leitura dos csv's customizada para evitar que as colunas dos arquivos ficassem quebradas (com mais ou menos colunas). 
+- Foi encontrado registros com caracteres que quebram o parser padrão do apache spark utilizando DataFrameReader como "\\" que é o caracter de scape default. Foi preciso implementar uma leitura dos csv's customizada para evitar que as colunas dos arquivos ficassem quebradas (com mais ou menos colunas). 
 
 - Cuidar com campos que podem ser nulos e avaliar se o campo contém valores como: null ou embranco ("")
 
