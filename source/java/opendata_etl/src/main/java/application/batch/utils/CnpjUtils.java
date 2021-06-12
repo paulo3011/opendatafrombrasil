@@ -140,7 +140,10 @@ public class CnpjUtils {
 
             if (numberString == null || numberString.equals("null") || numberString.equals(""))
                 return null;
-            return Short.decode(numberString);
+
+            String regexStr = "^0+(?!$)";
+
+            return Short.decode(numberString.replaceFirst(regexStr,""));
         }
         catch (Exception ex){
             return null;

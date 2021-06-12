@@ -119,7 +119,8 @@ public class CnpjRaw implements IPipeline {
         //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");
         //parameters.setOutputFileFormat(FileFormat.orc);
 
         //this.loadTest(sparkSession);
