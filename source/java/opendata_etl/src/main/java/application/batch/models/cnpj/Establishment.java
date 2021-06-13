@@ -138,7 +138,7 @@ public class Establishment extends FromTextFileModel {
     @Getter @Setter
     private String addressComplement;
     /**
-     * NEIGHBORHOOD WHERE THE ESTABLISHMENT IS LOCATED.
+     * AREA WHERE THE ESTABLISHMENT IS LOCATED.
      *
      * BAIRRO ONDE SE LOCALIZA O ESTABELECIMENTO.
      */
