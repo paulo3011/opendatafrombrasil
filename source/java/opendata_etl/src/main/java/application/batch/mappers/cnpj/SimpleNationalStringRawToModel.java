@@ -31,11 +31,11 @@ public class SimpleNationalStringRawToModel implements FlatMapFunction<Iterator<
             String[] values = CnpjUtils.splitTextLine(textLine);
             record.setBasicCnpj(CnpjUtils.fixStringValues(values[0]));
             record.setIsSimple(CnpjUtils.fixStringValues(values[1]).equals("S"));
-            record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(values[2]));
-            record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(values[3]));
+            record.setSimpleOptionDate(CnpjUtils.getSqlDate(values[2]));
+            record.setSimpleExclusionDate(CnpjUtils.getSqlDate(values[3]));
             record.setIsMei(CnpjUtils.fixStringValues(values[4]).equals("S"));
-            record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(values[5]));
-            record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(values[6]));
+            record.setMeiOptionDate(CnpjUtils.getSqlDate(values[5]));
+            record.setMeiExclusionDate(CnpjUtils.getSqlDate(values[6]));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), textLine);

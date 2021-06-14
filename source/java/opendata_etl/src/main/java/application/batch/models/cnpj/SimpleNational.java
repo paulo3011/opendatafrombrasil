@@ -4,6 +4,8 @@ import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Date;
+
 public class SimpleNational extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
@@ -15,13 +17,13 @@ public class SimpleNational extends FromTextFileModel {
     @Getter @Setter
     private Boolean isSimple;
     @Getter @Setter
-    private String simpleOptionDate;
+    private Date simpleOptionDate;
     @Getter @Setter
-    private String simpleExclusionDate;
+    private Date simpleExclusionDate;
     @Getter @Setter
     private Boolean isMei;
     @Getter @Setter
-    private String meiOptionDate;
+    private Date meiOptionDate;
     @Getter @Setter
-    private String meiExclusionDate;
+    private Date meiExclusionDate;
 }

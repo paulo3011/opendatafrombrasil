@@ -1,3 +1,4 @@
+import application.batch.utils.CnpjUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -123,5 +124,14 @@ public class ParseCsvTest {
         Assert.assertEquals("11", "011".replaceFirst(regexStr,""));
         Assert.assertEquals("11", "00011".replaceFirst(regexStr,""));
         Assert.assertEquals("11", "11".replaceFirst(regexStr,""));
+    }
+
+    @Test
+    public void dateParseTest(){
+        //yyyymmdd
+        String dateAsString = "20210614";
+        java.sql.Date dt = CnpjUtils.getSqlDate(dateAsString);
+        assert dt != null;
+        Assert.assertEquals("2021-06-14", dt.toString());
     }
 }

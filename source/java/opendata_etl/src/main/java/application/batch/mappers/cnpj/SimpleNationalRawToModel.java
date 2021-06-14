@@ -5,6 +5,7 @@ import application.batch.utils.CnpjUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Row;
 
+@SuppressWarnings("unused")
 public class SimpleNationalRawToModel implements MapFunction<Row, SimpleNational> {
     /**
      * Class serialization version
@@ -17,12 +18,16 @@ public class SimpleNationalRawToModel implements MapFunction<Row, SimpleNational
         SimpleNational record = new SimpleNational();
         try {
             record.setBasicCnpj(CnpjUtils.getString(value,"basic_cnpj"));
-            record.setIsSimple(CnpjUtils.getString(value,"is_simple").equals("S"));
-            record.setSimpleOptionDate(CnpjUtils.getLocalDateAsString(value, "simple_option_date"));
-            record.setSimpleExclusionDate(CnpjUtils.getLocalDateAsString(value, "simple_exclusion_date"));
-            record.setIsMei(CnpjUtils.getString(value,"is_mei").equals("S"));
-            record.setMeiOptionDate(CnpjUtils.getLocalDateAsString(value, "mei_option_date"));
-            record.setMeiExclusionDate(CnpjUtils.getLocalDateAsString(value, "mei_exclusion_date"));
+            String simpleStr = CnpjUtils.getString(value,"is_simple");
+            String meiStr = CnpjUtils.getString(value,"is_mei");
+            boolean isSimple = simpleStr != null && simpleStr.equals("S");
+            boolean isMei = meiStr != null && meiStr.equals("S");
+            record.setIsSimple(isSimple);
+            record.setSimpleOptionDate(CnpjUtils.getSqlDate(value, "simple_option_date"));
+            record.setSimpleExclusionDate(CnpjUtils.getSqlDate(value, "simple_exclusion_date"));
+            record.setIsMei(isMei);
+            record.setMeiOptionDate(CnpjUtils.getSqlDate(value, "mei_option_date"));
+            record.setMeiExclusionDate(CnpjUtils.getSqlDate(value, "mei_exclusion_date"));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), value.toString());

@@ -3,6 +3,7 @@ package application.batch.utils;
 import org.apache.spark.sql.Row;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +56,14 @@ public class CnpjUtils {
         return getLocalDate(dateAsString,null);
     }
 
+    public static Date getSqlDate(String dateAsString) {
+        LocalDate localDate = getLocalDate(dateAsString,null);
+        if(localDate == null)
+            return null;
+
+        return Date.valueOf(localDate);
+    }
+
     /**
      * Returns the local date for the row and index using CNPJ dataset date format.
      * @param value The Row with values
@@ -63,6 +72,14 @@ public class CnpjUtils {
      */
     public static LocalDate getLocalDate(Row value, String filedName) {
         return getLocalDate(getString(value, filedName), filedName);
+    }
+
+    public static Date getSqlDate(Row value, String filedName) {
+        LocalDate localDate = getLocalDate(getString(value, filedName),filedName);
+        if(localDate == null)
+            return null;
+
+        return Date.valueOf(localDate);
     }
 
     /**
