@@ -14,7 +14,7 @@ import java.util.Iterator;
 @SuppressWarnings("unused")
 public class EstablishmentsStringRawToModel implements FlatMapFunction<Iterator<String>, Establishment>, Serializable {
     @Override
-    public Iterator<Establishment> call(Iterator<String> stringIterator) throws Exception {
+    public Iterator<Establishment> call(Iterator<String> stringIterator) {
         ArrayList<Establishment> records = new ArrayList<>();
         while(stringIterator.hasNext()){
             String textLine = stringIterator.next();
@@ -33,13 +33,13 @@ public class EstablishmentsStringRawToModel implements FlatMapFunction<Iterator<
             record.setMatrixBranch(CnpjUtils.getShort(values[3]));
             record.setFantasyName(CnpjUtils.fixStringValues(values[4]));
             record.setRegistrationStatus(CnpjUtils.getShort(values[5]));
-            record.setDateRegistrationStatus(CnpjUtils.getLocalDateAsString(values[6]));
-            record.setReasonRegistrationStatus(Integer.decode(CnpjUtils.fixStringValues(values[7])));
-            record.setNameCityAbroad(CnpjUtils.fixStringValues(values[8]));
-            record.setCountryCode(CnpjUtils.fixStringValues(values[9]));
-            record.setActivityStartDate(CnpjUtils.getLocalDateAsString(values[10]));
-            record.setMainCnaeFiscal(CnpjUtils.fixStringValues(values[11]));
-            record.setSecondaryCnaeFiscal(CnpjUtils.fixStringValues(values[12]));
+            record.setRegistrationStatusDate(CnpjUtils.getSqlDate(values[6]));
+            record.setRegistrationStatusReason(Integer.decode(CnpjUtils.fixStringValues(values[7])));
+            record.setCityAbroadName(CnpjUtils.fixStringValues(values[8]));
+            record.setCountryCode(CnpjUtils.getInteger(values[9]));
+            record.setActivityStartDate(CnpjUtils.getSqlDate(values[10]));
+            record.setMainCnae(CnpjUtils.getInteger(values[11]));
+            record.setSecondaryCnae(CnpjUtils.fixStringValues(values[12]));
             record.setAddressType(CnpjUtils.fixStringValues(values[13]));
             record.setAddress(CnpjUtils.fixStringValues(values[14]));
             record.setAddressNumber(CnpjUtils.fixStringValues(values[15]));
@@ -47,7 +47,7 @@ public class EstablishmentsStringRawToModel implements FlatMapFunction<Iterator<
             record.setAddressDistrict(CnpjUtils.fixStringValues(values[17]));
             record.setZipCode(CnpjUtils.fixStringValues(values[18]));
             record.setState(CnpjUtils.fixStringValues(values[19]));
-            record.setCityJurisdictionCode(CnpjUtils.fixStringValues(values[20]));
+            record.setCityCode(CnpjUtils.getInteger(values[20]));
             record.setTelephone1AreaCode(CnpjUtils.fixStringValues(values[21]));
             record.setTelephone1(CnpjUtils.fixStringValues(values[22]));
             record.setTelephone2AreaCode(CnpjUtils.fixStringValues(values[23]));
@@ -56,7 +56,7 @@ public class EstablishmentsStringRawToModel implements FlatMapFunction<Iterator<
             record.setFaxNumber(CnpjUtils.fixStringValues(values[26]));
             record.setTaxpayerEmail(CnpjUtils.fixStringValues(values[27]));
             record.setSpecialSituation(CnpjUtils.fixStringValues(values[28]));
-            record.setSpecialSituationDate(CnpjUtils.getLocalDateAsString(values[29]));
+            record.setSpecialSituationDate(CnpjUtils.getSqlDate(values[29]));
         }
         catch (Exception ex){
             System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), textLine);

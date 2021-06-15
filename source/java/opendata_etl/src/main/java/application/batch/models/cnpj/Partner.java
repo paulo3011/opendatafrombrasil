@@ -4,6 +4,8 @@ import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Date;
+
 /**
  * Partner
  *
@@ -29,7 +31,7 @@ public class Partner extends FromTextFileModel {
      * 3 – ESTRANGEIRO
      */
     @Getter @Setter
-    private short partnerType;
+    private Short partnerType;
     /**
      *
      * NAME OF PARTNER INDIVIDUAL OR CORPORATE NAME AND/OR NAME
@@ -55,21 +57,21 @@ public class Partner extends FromTextFileModel {
      * CODIGO DA QUALIFICAÇÃO DO SÓCIO
      */
     @Getter @Setter
-    private short partnerQualification;
+    private Integer partnerQualification;
     /**
      * DATE OF ENTRY INTO THE COMPANY
      *
      * DATA DE ENTRADA NA SOCIEDADE
      */
     @Getter @Setter
-    private String partnerStartDate;
+    private Date partnerStartDate;
     /**
      * COUNTRY CODE OF FOREIGN PARTNER
      *
      * CODIGO PAIS DO SÓCIO ESTRANGEIRO
      */
     @Getter @Setter
-    private String country;
+    private Integer country;
     /**
      * CPF NUMBER OF THE LEGAL REPRESENTATIVE
      *
@@ -90,12 +92,12 @@ public class Partner extends FromTextFileModel {
      * CODIGO DA QUALIFICAÇÃO DO REPRESENTANTE LEGAL
      */
     @Getter @Setter
-    private short representativeQualification;
+    private Integer representativeQualification;
     /**
      * CODE CORRESPONDING TO THE AGE RANGE OF THE MEMBER
      *
      * CODIGO CORRESPONDENTE A FAIXA ETARIA DO SÓCIO
      */
     @Getter @Setter
-    private short ageRange;
+    private Short ageRange;
 }

@@ -19,7 +19,6 @@ public class PartnerStringRawToModel implements FlatMapFunction<Iterator<String>
         return records.iterator();
     }
 
-    @SuppressWarnings("ConstantConditions")
     public Partner tryParseRecord(String textLine){
         Partner record = new Partner();
         try {
@@ -28,12 +27,12 @@ public class PartnerStringRawToModel implements FlatMapFunction<Iterator<String>
             record.setPartnerType(CnpjUtils.getShort(values[1]));
             record.setPartnerName(CnpjUtils.fixStringValues(values[2]));
             record.setPartnerDocument(CnpjUtils.fixStringValues(values[3]));
-            record.setPartnerQualification(CnpjUtils.getShort(values[4]));
-            record.setPartnerStartDate(CnpjUtils.getLocalDateAsString(values[5]));
-            record.setCountry(CnpjUtils.fixStringValues(values[6]));
+            record.setPartnerQualification(CnpjUtils.getInteger(values[4]));
+            record.setPartnerStartDate(CnpjUtils.getSqlDate(values[5]));
+            record.setCountry(CnpjUtils.getInteger(values[6]));
             record.setLegalRepresentative(CnpjUtils.fixStringValues(values[7]));
             record.setRepresentativeName(CnpjUtils.fixStringValues(values[8]));
-            record.setRepresentativeQualification(CnpjUtils.getShort(values[9]));
+            record.setRepresentativeQualification(CnpjUtils.getInteger(values[9]));
             record.setAgeRange(CnpjUtils.getShort(values[10]));
         }
         catch (Exception ex){

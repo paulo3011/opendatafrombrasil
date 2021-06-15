@@ -128,6 +128,17 @@ public class CnpjUtils {
         }
     }
 
+    public static BigDecimal getBigDecimal(String value)  {
+        try {
+            NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+            String numberString = fixStringValues(value);
+            return new BigDecimal(nf.parse(numberString).toString());
+        }
+        catch (Exception ex){
+            return BigDecimal.ZERO;
+        }
+    }
+
     public static String getBigDecimalAsString(String value)  {
         try {
             NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
@@ -171,7 +182,7 @@ public class CnpjUtils {
         String regexStr = "^0+(?!$)";
         numberString = fixStringValues(numberString);
 
-        if(numberString == null)
+        if(numberString == null || numberString.isEmpty())
             return null;
 
         return Integer.parseInt(numberString.replaceFirst(regexStr,""));

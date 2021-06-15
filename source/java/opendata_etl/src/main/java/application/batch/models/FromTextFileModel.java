@@ -33,6 +33,7 @@ public class FromTextFileModel implements Serializable {
      * @param dataset the dataset to drop columns
      * @param <T> dataset type
      */
+    @SuppressWarnings("unused")
     public static <T> Dataset<Row> dropDebugColumns(Dataset<T> dataset){
         return dataset.drop("rawData","parseErrorMessage");
     }

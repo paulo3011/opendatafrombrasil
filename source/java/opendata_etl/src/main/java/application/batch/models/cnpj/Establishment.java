@@ -5,6 +5,8 @@ import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Date;
+
 public class Establishment extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
@@ -68,49 +70,49 @@ public class Establishment extends FromTextFileModel {
      * DATA DO EVENTO DA SITUAÇÃO CADASTRAL
      */
     @Getter @Setter
-    private String dateRegistrationStatus;
+    private Date registrationStatusDate;
     /**
      * CODE OF REASON FOR REGISTRATION STATUS
      *
      * CODIGO DO MOTIVO DA SITUAÇÃO CADASTRAL
      */
     @Getter @Setter
-    private int reasonRegistrationStatus;
+    private Integer registrationStatusReason;
     /**
      * NAME OF THE CITY ABROAD
      *
      * NOME DA CIDADE NO EXTERIOR
      */
     @Getter @Setter
-    private String nameCityAbroad;
+    private String cityAbroadName;
     /**
      * COUNTRY CODE
      *
      * CODIGO DO PAIS
      */
     @Getter @Setter
-    private String countryCode;
+    private Integer countryCode;
     /**
      * START DATE OF ACTIVITY
      *
      * DATA DE INICIO DA ATIVIDADE
      */
     @Getter @Setter
-    private String activityStartDate;
+    private Date activityStartDate;
     /**
      * CODE OF THE MAIN ECONOMIC ACTIVITY OF THE ESTABLISHMENT
      *
      * CODIGO DA ATIVIDADE ECONOMICA PRINCIPAL DO ESTABELECIMENTO
      */
     @Getter @Setter
-    private String mainCnaeFiscal;
+    private Integer mainCnae;
     /**
      * CODE OF THE SECONDARY ECONOMIC ACTIVITY(S) OF THE ESTABLISHMENT
      *
      * CODIGO DA(S) ATIVIDADE(S) ECONOMICA(S) SECUNDARIA(S) DO ESTABELECIMENTO
      */
     @Getter @Setter
-    private String secondaryCnaeFiscal;
+    private String secondaryCnae;
     /**
      * THE ADDRESS TYPE
      *
@@ -162,7 +164,7 @@ public class Establishment extends FromTextFileModel {
      * CODIGO DO MUNICIPIO DE JURISDIÇÃO ONDE SE ENCONTRA O ESTABELECIMENTO (NAO É O CODIGO DO IBGE)
      */
     @Getter @Setter
-    private String cityJurisdictionCode;
+    private Integer cityCode;
     @Getter @Setter
     private String telephone1AreaCode;
     @Getter @Setter
@@ -185,5 +187,5 @@ public class Establishment extends FromTextFileModel {
     @Getter @Setter
     private String specialSituation;
     @Getter @Setter
-    private String specialSituationDate;
+    private Date specialSituationDate;
 }

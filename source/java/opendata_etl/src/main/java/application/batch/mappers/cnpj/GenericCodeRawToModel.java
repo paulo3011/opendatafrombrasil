@@ -13,6 +13,7 @@ public class GenericCodeRawToModel<T extends GenericCode> implements MapFunction
         this.tClass = tClass;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public T call(Row value) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         T record = tClass.getDeclaredConstructor().newInstance();

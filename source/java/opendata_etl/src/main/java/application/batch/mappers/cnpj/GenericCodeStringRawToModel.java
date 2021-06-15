@@ -25,6 +25,7 @@ public class GenericCodeStringRawToModel<T extends GenericCode> implements FlatM
         return records.iterator();
     }
 
+    @SuppressWarnings("ConstantConditions")
     public T tryParseRecord(String textLine) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         T record = tClass.getDeclaredConstructor().newInstance();
         try {

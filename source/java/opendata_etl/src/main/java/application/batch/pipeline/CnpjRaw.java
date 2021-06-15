@@ -4,6 +4,7 @@ import application.batch.contracts.IPipeline;
 import application.batch.enums.FileFormat;
 import application.batch.enums.FileType;
 import application.batch.mappers.cnpj.*;
+import application.batch.models.FromTextFileModel;
 import application.batch.models.args.Parameters;
 import application.batch.models.cnpj.Company;
 import application.batch.models.cnpj.Establishment;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,10 +120,13 @@ public class CnpjRaw implements IPipeline {
             throws ReflectiveOperationException {
         //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
-        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");
-        //parameters.setOutputFileFormat(FileFormat.orc);
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");//
+        parameters.setOutputFileFormat(FileFormat.orc);
+
+        //para debugar schema
+        //loadOrcTest(sparkSession);
 
         //this.loadTest(sparkSession);
 
@@ -193,6 +198,7 @@ public class CnpjRaw implements IPipeline {
      * @throws InvocationTargetException InvocationTargetException
      * @throws InstantiationException InstantiationException
      */
+    @SuppressWarnings("SameParameterValue")
     private <T, U extends FlatMapFunction<Iterator<String>, T>> void analyzeRawData2(
             SparkSession sparkSession,
             Parameters parameters,
@@ -288,6 +294,33 @@ public class CnpjRaw implements IPipeline {
         ds.printSchema();
         long total = ds.count();
         System.out.println("*** total records: " + total);
+    }
+
+    public void loadOrcTest(SparkSession spark){
+        DataFrameReader reader = spark.read()
+                .format("orc")
+                ;
+        //if(schema != null)
+            //reader = reader.schema(schema);
+
+        //Dataset<Row> df = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\company\\part-00107-307ba805-562b-4471-9089-a3fadeb548ea-c000.snappy.orc");
+        //debugDataSet(df);
+
+        //String establisment = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\establishment\\part-00319-35da67fe-1851-4628-93f6-9cd3d1e2b799-c000.snappy.orc";
+        //Dataset<Row> df2 = reader.load(establisment);
+        //debugDataSet(df2);
+
+        //String country_code = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\country_code\\part-00000-d5ae1e49-7ac4-415d-bcef-bc43e0837742-c000.snappy.orc";
+        //Dataset<Row> df3 = reader.load(country_code);
+        //debugDataSet(df3);
+
+        //String partner = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\partner\\part-00066-0da314b6-d491-4aa1-8cce-5b053e7e1dd8-c000.snappy.orc";
+        //Dataset<Row> df4 = reader.load(partner);
+        //debugDataSet(df4);
+
+        String simple = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\simple_national\\part-00048-66866090-95bf-4e9f-8563-1287f9848d9a-c000.snappy.orc";
+        Dataset<Row> df5 = reader.load(simple);
+        debugDataSet(df5);
     }
 
     @SuppressWarnings("unused")
@@ -436,6 +469,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalStringRawToModel.class, SimpleNational.class, cache);
+        sourceDf = trackErrors(sourceDf, parameters, SIMPLE_NATIONAL_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -451,6 +485,29 @@ public class CnpjRaw implements IPipeline {
         }
     }
 
+    public Dataset<Row> trackErrors(Dataset<Row> sourceDs, Parameters parameters, String datasetName){
+        boolean containDebugColumns = false;
+        for (String c : sourceDs.columns()) {
+            if (c.equals("rawData") || c.equals("parseErrorMessage")) {
+                containDebugColumns = true;
+                break;
+            }
+        }
+
+        if(!containDebugColumns)
+            return sourceDs;
+
+        List<Column> columns = Arrays.asList(new Column("rawData"),new Column("parseErrorMessage"));
+        Dataset<Row> errors = sourceDs.select(JavaConverters.asScalaIteratorConverter(columns.iterator()).asScala().toSeq());
+
+        DataFrameWriter<Row> dfWriter = errors.write().format(FileFormat.parquet.toString().toLowerCase());
+        dfWriter.mode(SaveMode.Overwrite);
+        dfWriter.save(Paths.get(parameters.getInputPath(), "errors", datasetName).toString());
+
+        Dataset<Row> resultDataset = FromTextFileModel.dropDebugColumns(sourceDs);
+        return resultDataset;
+    }
+
     /**
      * Execute the Establishment and Company Transformation.
      * @param sparkSession Spark Session
@@ -459,8 +516,9 @@ public class CnpjRaw implements IPipeline {
      */
     public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsStringRawToModel.class, Establishment.class, cache);
-
+        sourceDf = trackErrors(sourceDf, parameters, ESTABLISHMENT_FOLDER);
         Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, cache);
+        companySourceDf = trackErrors(companySourceDf, parameters, COMPANY_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -503,6 +561,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runPartnerTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerStringRawToModel.class, Partner.class, cache);
+        sourceDf = trackErrors(sourceDf, parameters, PARTNER_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -540,6 +599,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runCityCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CITY_CODE_RAW_GLOB, CITY_CODE_FOLDER, cache);
+        sourceDf = trackErrors(sourceDf, parameters, CITY_CODE_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -565,6 +625,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runCnaeCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CNAE_CODE_RAW_GLOB, CNAE_CODE_FOLDER, cache);
+        sourceDf = trackErrors(sourceDf, parameters, CNAE_CODE_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -590,6 +651,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runCountryCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, COUNTRY_CODE_RAW_GLOB, COUNTRY_CODE_FOLDER, cache);
+        sourceDf = trackErrors(sourceDf, parameters, COUNTRY_CODE_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -615,6 +677,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runLegalNatureCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, LEGAL_NATURE_CODE_RAW_GLOB, LEGAL_NATURE_CODE_FOLDER, cache);
+        sourceDf = trackErrors(sourceDf, parameters, LEGAL_NATURE_CODE_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -640,6 +703,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runPartnerQualificationCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_QUALIFICATION_CODE_RAW_GLOB, PARTNER_QUALIFICATION_CODE_FOLDER, cache);
+        sourceDf = trackErrors(sourceDf, parameters, PARTNER_QUALIFICATION_CODE_FOLDER);
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {

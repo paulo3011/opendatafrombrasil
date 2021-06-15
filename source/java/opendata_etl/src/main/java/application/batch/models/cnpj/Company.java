@@ -4,6 +4,8 @@ import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 public class Company extends FromTextFileModel {
     /**
      * BASE CNPJ REGISTRATION NUMBER (FIRST EIGHT DIGITS OF CNPJ).
@@ -25,21 +27,21 @@ public class Company extends FromTextFileModel {
      * CÓDIGO DA NATUREZA JURIDICA
      */
     @Getter @Setter
-    private String legalNature;
+    private Integer legalNature;
     /**
      * QUALIFICATION OF THE INDIVIDUAL RESPONSIBLE FOR THE COMPANY
      *
      * QUALIFICACAO DA PESSOA FISICA RESPONSAVEL PELA EMPRESA
      */
     @Getter @Setter
-    private String responsibleQualification;
+    private Short responsibleQualification;
     /**
      * COMPANY SHARE CAPITAL
      *
      * CAPITAL SOCIAL DA EMPRESA
      */
     @Getter @Setter
-    private String companyCapital;
+    private BigDecimal companyCapital;
     /**
      * COMPANY PORT CODE:
      * 1  - NOT INFORMED
