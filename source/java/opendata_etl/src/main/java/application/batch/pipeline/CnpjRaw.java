@@ -11,6 +11,7 @@ import application.batch.models.cnpj.Establishment;
 import application.batch.models.cnpj.Partner;
 import application.batch.models.cnpj.SimpleNational;
 import application.batch.models.cnpj.genericcodes.*;
+import application.batch.utils.SparkTextUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -22,6 +23,7 @@ import scala.collection.Seq;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -279,7 +281,8 @@ public class CnpjRaw implements IPipeline {
         By default, Spark creates one partition for each block of the file (blocks being 128MB by default in HDFS),
         but you can also ask for a higher number of partitions by passing a larger value. Note that you cannot have fewer partitions than blocks.
          */
-        JavaRDD<String> csvLines = sparkContext.textFile(path);
+        //JavaRDD<String> csvLines = sparkContext.textFile(path);
+        JavaRDD<String> csvLines = SparkTextUtils.withCharset(sparkContext, path, StandardCharsets.ISO_8859_1.toString());
         JavaRDD<T> est = csvLines.mapPartitions(mapperClass.getDeclaredConstructor().newInstance());
         //List<T> list = est.collect();
 
@@ -459,8 +462,8 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws Exception {
-        runCompanyTransformation(sparkSession,parameters,cache);
         runGenericCodeTransformation(sparkSession,parameters,cache);
+        runCompanyTransformation(sparkSession,parameters,cache);
         runPartnerTransformation(sparkSession,parameters,cache);
         runEstablishmentTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
