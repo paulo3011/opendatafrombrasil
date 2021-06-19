@@ -243,14 +243,13 @@ return nf.parse(numberString).toString();
 
 ## 3. Definir o modelo de dados
 
-### __O que a aplicação faz__
+### __Modelo__
 
-todo:
-
-Requi
+![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
 
 
-## Requisitos funcionais:
+
+# Requisitos funcionais da aplicação:
 
 - Transformar do formato de origem para o de destino   
 - Permitir criar implementações de transformações de forma customizadas no futuro
