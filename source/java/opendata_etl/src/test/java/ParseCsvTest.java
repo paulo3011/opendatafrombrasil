@@ -218,11 +218,65 @@ public class ParseCsvTest {
 
         JavaRDD<String> csvLines = sparkContext.parallelize(Arrays.asList(lines));
         JavaRDD<Company> est = csvLines.mapPartitions(new CompanyStringRawToModel());
-        Dataset<Row> df = sparkSession.createDataFrame(est, Company.class).select(Company.getColumns());
+        Dataset<Row> df = sparkSession.createDataFrame(est, Company.class);
+        Column newCol = df.col("companyCapital").cast("decimal(14,2)");
+        df = df.withColumn("companyCapital2", newCol)
+                .drop("companyCapital")
+                .withColumnRenamed("companyCapital2","companyCapital")
+                .select(Company.getColumns());
 
         df.printSchema();
         df.show(3);
+        df.collect();
 
     }
 
+    private <T> void debugDataSet(Dataset<T> ds) {
+        ds.show(5);
+        ds.printSchema();
+    }
+
+    public SparkSession getOrCreateSparkSession(){
+        SparkConf conf = new SparkConf().setAppName("SparkSample").setMaster("local[*]");
+        SparkSession sparkSession = SparkSession
+                .builder()
+                .config(conf)
+                .getOrCreate();
+        return sparkSession;
+    }
+
+    @Test
+    public void debugEstablishmentSchema(){
+        SparkSession sparkSession = getOrCreateSparkSession();
+        DataFrameReader reader = sparkSession.read().format("orc");
+
+        String path = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\2021-06-19\\establishment\\part-00035-0f735af4-a1a0-4ba7-946e-6c7b7edbee74-c000.snappy.orc";
+        Dataset<Row> ds = reader.load(path);
+        ds.printSchema();
+    }
+
+    @Test
+    public void debugPartnerSchema(){
+        SparkSession sparkSession = getOrCreateSparkSession();
+        DataFrameReader reader = sparkSession.read().format("orc");
+
+        String path = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\2021-06-19\\partner\\part-00000-2b965d19-bd1e-4ded-adff-b0a25b3a3419-c000.snappy.orc";
+        Dataset<Row> ds = reader.load(path);
+        ds.printSchema();
+
+        /*
+        root
+         |-- basicCnpj: string (nullable = true)
+         |-- partnerType: short (nullable = true)
+         |-- partnerName: string (nullable = true)
+         |-- partnerDocument: string (nullable = true)
+         |-- partnerQualification: integer (nullable = true)
+         |-- partnerStartDate: date (nullable = true)
+         |-- country: integer (nullable = true)
+         |-- legalRepresentative: string (nullable = true)
+         |-- representativeName: string (nullable = true)
+         |-- representativeQualification: integer (nullable = true)
+         |-- ageRange: short (nullable = true)
+         */
+    }
 }
