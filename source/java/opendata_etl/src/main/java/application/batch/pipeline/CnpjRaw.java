@@ -133,15 +133,13 @@ public class CnpjRaw implements IPipeline {
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");//
         parameters.setOutputFileFormat(FileFormat.orc);
 
-        debugSchemas(sparkSession);
+        //debugSchemas(sparkSession);
 
         //this.loadTest(sparkSession);
 
         //this.analyzeRawData(sparkSession, parameters);
 
-        //runTransformation(sparkSession,parameters,true);
-
-
+        runTransformation(sparkSession,parameters,true);
     }
 
     @SuppressWarnings("unused")
@@ -461,9 +459,10 @@ public class CnpjRaw implements IPipeline {
      * @param cache Save dataframe on cache if true
      */
     public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws Exception {
+        runCompanyTransformation(sparkSession,parameters,cache);
         runGenericCodeTransformation(sparkSession,parameters,cache);
         runPartnerTransformation(sparkSession,parameters,cache);
-        runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
+        runEstablishmentTransformation(sparkSession,parameters,cache);
         runSimpleNationalTransformation(sparkSession,parameters,cache);
     }
 
@@ -535,20 +534,15 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+    public void runEstablishmentTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsStringRawToModel.class, Establishment.class, cache);
         sourceDf = trackErrors(sourceDf, parameters, ESTABLISHMENT_FOLDER, Establishment.getColumns());
-        Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, cache);
-        companySourceDf = trackErrors(companySourceDf, parameters, COMPANY_FOLDER, Company.getColumns());
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
             //no transformations, can be used to backup in a better format
             DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
-
-            DataFrameWriter<Row> companyDfWriter = getDataFrameWriter(companySourceDf, parameters);
-            companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
         }
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
@@ -556,10 +550,6 @@ public class CnpjRaw implements IPipeline {
             //transform to lake model
             DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
             dfWriter.save(Paths.get(parameters.getInputPath(), ESTABLISHMENT_FOLDER).toString());
-
-            //transform to lake model
-            DataFrameWriter<Row> companyDfWriter = getDataFrameWriter(companySourceDf, parameters);
-            companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
 
             /*
             //Unify establishment and company dataframes
@@ -571,6 +561,33 @@ public class CnpjRaw implements IPipeline {
             DataFrameWriter<Row> joinedDsDfWriter = getDataFrameWriter(joinedDs, parameters);
             joinedDsDfWriter.save(Paths.get(parameters.getInputPath(), FULL_COMPANY_FOLDER).toString());
             */
+        }
+    }
+
+    /**
+     * Execute the Establishment and Company Transformation.
+     * @param sparkSession Spark Session
+     * @param parameters App parameters
+     * @param cache Save dataframe on cache if true
+     */
+    public void runCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+        Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, cache);
+
+        //fix bigdecimal precision and scale
+        Column newCol = companySourceDf.col("companyCapital").cast("decimal(14,2)");
+        companySourceDf = companySourceDf
+                .withColumn("companyCapital2", newCol)
+                .drop("companyCapital")
+                .withColumnRenamed("companyCapital2","companyCapital");
+
+        //remove errors columns
+        companySourceDf = trackErrors(companySourceDf, parameters, COMPANY_FOLDER, Company.getColumns());
+
+        if(parameters.getOutputFileType() == FileType.cnpj_lake)
+        {
+            //transform to lake model
+            DataFrameWriter<Row> companyDfWriter = getDataFrameWriter(companySourceDf, parameters);
+            companyDfWriter.save(Paths.get(parameters.getInputPath(), COMPANY_FOLDER).toString());
         }
     }
 
