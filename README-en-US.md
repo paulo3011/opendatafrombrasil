@@ -8,7 +8,302 @@ Leia em outro idioma (Read this in other language):
 This project was made to explore the Brazil open data about companies.
 
 
-# References
+## Summary
+
+This project was designed to explore Brazil's open data on companies.
+
+This project followed the following steps:
+
+1. Define project scope and collect data
+2. Explore and evaluate the data
+3. Define the data model
+4. Run ETL to model the data
+5. Describe and document the Project
+
+
+## 1. Definition of project scope and data collection
+
+### __Project scope__
+
+This project's ultimate goal is to allow people to make analyzes related to Brazilian companies and provide a basis for decision-making, based on competition and other observed factors, such as:
+
+- In which city is a good place to start a business?
+- Who are the customers (companies or people who are partners of any company), cities or regions where it is possible to operate or offer services and products?
+- How big is the market available?
+- Who are my customers, what companies do they own, is there any contact information available?
+- Do I have a different approach for some clients due to the existence of a connection (society) between clients?
+
+## 2. Explore and evaluate the data
+
+### __Description of data sets__
+
+The datasets used initially come from the Brazilian government and are made available openly.
+
+__CNPJ Open Data__
+
+
+**Feature**|**Description**|**Status**
+-----|:-----:|:-----:
+Periodicidade atualização:|mensal
+Formato dados:|csv
+Origem:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/dados-publicos-cnpj)|![Website](https://img.shields.io/website?url=http%3A%2F%2F200.152.38.155%2FCNPJ%2F)
+Layout:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf)
+
+</br>
+
+Arquivos e exemplos:
+
+__Establishments__
+
+![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#estabelecimentos)
+
+</br>
+
+__Companies__
+
+![csv_empresas.jpg](./assets/images/cnpj/csv_empresas.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#empresas)
+
+</br>
+
+__Partners__
+
+![csv_socios.jpg](./assets/images/cnpj/csv_socios.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#sócios)
+
+</br>
+
+__CNAE - National Classification of Economic Activities__
+
+![csv_cnaes.jpg](./assets/images/cnpj/csv_cnaes.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#cnae---classificação-nacional-de-atividades-econômicas)
+
+_Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
+
+</br>
+
+__Legal Nature__
+
+![csv_naturezajuridica.jpg](./assets/images/cnpj/csv_naturezajuridica.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#natureza-jurídica)
+
+_Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
+
+</br>
+
+__Member Qualification__
+
+![csv_qualificacao.jpg](./assets/images/cnpj/csv_qualificacao.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#qualificação-do-sócio)
+
+</br>
+
+__City Code__
+
+![csv_municipio.jpg](./assets/images/cnpj/csv_municipio.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#código-do-município)
+
+</br>
+
+__Country code__
+
+![csv_pais.jpg](./assets/images/cnpj/csv_pais.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#código-do-país)
+
+</br>
+
+__Data from the National Simple__
+
+![csv_simples.jpg](./assets/images/cnpj/csv_simples.jpg)
+[Field Dictionary](./assets/docs/database/dictionary.md#dados-do-simples-nacional)
+
+</br>
+
+
+__Reason for Registration Status__
+
+https://receita.economia.gov.br/orientacao/tributaria/cadastros/cadastro-nacional-de-pessoas-juridicas-cnpj/DominiosMotivoSituaoCadastral.csv/view
+
+__Comments__
+
+1. The field (CNPJ/CPF OF THE PARTNER) and (CNPJ/CPF OF THE REPRESENTATIVE) of the layout of partners must be uncharacterized according to the rule below:
+
+- Concealment of confidential personal information as in the case of the CPF, which must be uncharacterized by hiding the first three digits and the two verification digits, as provided for in art. 129 § 2 of Law No. 13.473/2017 (LDO
+2018).
+
+2. Responsible Federative Entity Field - EFR, in the Main Layout (Registration Data):
+
+It must be completed for the cases of Bodies and Entities of the 1XX Legal Nature group. For other natures, this attribute is blank.
+
+Examples of text that should appear in the final file:
+
+- UNION;
+- FEDERAL DISTRICT;
+- BAHIA;
+
+for municipalities, also display the acronym of the UF:
+
+- SAO PAULO-SP;
+- BELO HORIZONTE – MG;
+
+3. Age Range field, in the Members Layout
+
+Based on the date of birth of the CPF of each partner, the value for the Age group field must be created according to the rule below:
+
+- 1 for the intervals between 0 and 12 years;
+- 2 for the intervals between 13 and 20 years;
+- 3 for the intervals between 21 and 30 years;
+- 4 for the intervals between 31 and 40 years;
+- 5 for the intervals between 41 and 50 years;
+- 6 for the intervals between 51 and 60 years;
+- 7 for the intervals between 61 and 70 years;
+- 8 for the intervals between 71 and 80 years;
+- 9 for people over 80 years old;
+- 0 for not applicable;
+
+4. The CNAE FISCAL SECONDARY Field, in the Establishments Layout:
+
+It must be filled in with each occurrence being separated by a comma, for cases of multiple occurrences.
+
+</br>
+
+### __Known Data Issues and How to Address__
+<br/>
+
+__Archive:__ K3241.K03200Y0.D10410.ESTABELE
+
+__Field:__ Date registration status
+
+__Value:__ 0
+
+__Problema:__ Invalid format
+
+```txt
+"30005475";"0001";"31";"1";"";"2";"0";"0";"";"";"20180322";"6204000";"6209100,7490104";"AVENIDA";"PAULISTA";"2202";"CONJ  54-B";"BELA VISTA";"01310300";"SP";"7107";"11";"59085410";"";"";"";"";"CEFISCO@UOL.COM.BR";"";""
+```
+
+__Archive:__ 
+
+__Field:__ Date registration status
+
+__Value:__ 4100813
+
+__Problema:__ Invalid format
+
+```txt
+"18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
+```
+
+__Archive:__ K3241.K03200Y0.D10410.ESTABELE
+
+__Field:__ Date registration status
+
+__Value:__ 4100813
+
+__Problema:__ Complement "EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805" it has a semicolon which is the file separator and depending on the csv parser being used it gets lost and messes up the columns.
+
+```txt
+"36452531";"0001";"62";"1";"AMPPLA CREATIVE STUDIO";"2";"20200221";"0";"";"";"20200221";"1821100";"5819100,5811500,5812302,1813001,5912099,5812301,7319002,5813100";"ESTRADA";"DO MANDU";"560";"EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805";"SAO MARCOS";"41250400";"BA";"3849";"71";"99479533";"";"";"";"";"JONATASMA@GMAIL.COM";"";""
+```
+
+<br/>
+
+### __Necessary care__
+<br/>
+
+- Found records with characters that break the apache spark default parser using DataFrameReader as "\\" which is the default scape character. It was necessary to implement a custom csv's reading to prevent the columns of the files from being broken (with more or less columns).
+
+- Take care of fields that may be null and evaluate if the field contains values ​​like: null or empty ("")
+
+```Java
+public static String fixStringValues(String value) {
+        if (value == null || value.equals("null"))
+            return null;
+        return value.replaceAll("^\"|\"$", "");
+    }
+```
+
+- It was necessary to treat numeric values ​​(integers) that contained leading zeros, example: 0001. In these cases, the leading zeros were removed before converting to integer. Also it was necessary to check for null, empty values ​​before trying to convert.
+
+- To convert monetary values ​​it was necessary to use local format from Brazil
+
+```Java
+//exemplo
+public static String fixStringValues(String value) {
+    if (value == null || value.equals("null"))
+        return null;
+    return value.replaceAll("^\"|\"$", "");
+}
+NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+String numberString = fixStringValues("000000010000,00");
+return nf.parse(numberString).toString();
+```
+
+- Invalid dates were treated as null
+
+
+## 3. Define the data model
+
+### __Model__
+
+![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
+
+
+
+# Application functional requirements:
+
+- Transform from source to destination format
+- Allow to create custom transformation implementations in the future
+    - By default a pipeline using dataframe is used
+- Allow setting spark settings via:
+    - command line (spark-submit)
+    - application parameters
+- Allow to define the settings by read/write format (source/destination) via:
+    - application parameters
+- Allow to select the transformation pipeline according to the source and destination parameters
+
+# Future improvements
+
+## Adding new datasets
+
+__Population data__
+
+Collect data related to the Brazilian population to support analyzes related to starting a business or detecting opportunities.
+
+__Information related to land and real estate values__
+
+Collect data related to the purchase and sale price of properties and land so that it is possible to subsidize analyzes related to starting a business, detecting opportunities and competition.
+
+__Complaints related to companies__
+
+Collect data related to complaints opened or reported by customers on sites like Complain Here, procon para can analyze companies from this perspective. It can measure the level of customer satisfaction.
+
+__Weather information__
+
+Collect information related to temperature and weather to support analysis of starting a business, detecting opportunities and risks.
+
+__Data related to available workforce__
+
+Data on education and educational level.
+
+__CNAE - Detailed structure and explanatory notes__
+
+Describes in more detail which activities are included or not in each CNAE. This dataset can be used to more accurately locate companies by activities they may or may not perform.
+
+The PDF shows a pattern in the way of describing which activities are or are not included in each code, which allows for programmatic extraction.	
+
+https://concla.ibge.gov.br/images/concla/downloads/revisao2007/PropCNAE20/CNAE20_NotasExplicativas.pdf
+
+
+
+# Technical references
 
 - https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.md
 - https://github.com/tiimgreen/github-cheat-sheet/blob/master/README.md
+- https://udacity.github.io/git-styleguide/
+- https://shields.io/
+- https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
+- https://github.com/georgevbsantiago/qsacnpj/
+- https://www.kaggle.com/hugomathien/soccer/home
+- https://www.w3schools.com/python/python_intro.asp
