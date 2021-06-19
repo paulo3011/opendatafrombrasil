@@ -4,8 +4,14 @@ package application.batch.models.cnpj;
 import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.spark.sql.Column;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Establishment extends FromTextFileModel {
     /**
@@ -188,4 +194,20 @@ public class Establishment extends FromTextFileModel {
     private String specialSituation;
     @Getter @Setter
     private Date specialSituationDate;
+
+    public static List<String> getColumnList(){
+        return Arrays.asList("basicCnpj","cnpjOrder","cnpjCheckingDigit","matrixBranch","fantasyName","registrationStatus","registrationStatusDate","registrationStatusReason","cityAbroadName","countryCode","activityStartDate","mainCnae","secondaryCnae","addressType","address","addressNumber","addressComplement","addressDistrict","zipCode","state","cityCode","telephone1AreaCode","telephone1","telephone2AreaCode","telephone2","faxAreaCode","faxNumber","taxpayerEmail","specialSituation","specialSituationDate");
+    }
+
+    public static Seq<Column> getColumns(){
+        List<Column> columns = new ArrayList<>();
+        getColumnList().forEach(x -> {
+            columns.add(new Column(x));
+        });
+        return JavaConverters.asScalaBuffer(columns).toSeq();
+    }
+
+    public static String getSelectStatement(){
+        return String.join(",", getColumnList());
+    }
 }

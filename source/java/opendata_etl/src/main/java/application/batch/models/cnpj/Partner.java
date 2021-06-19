@@ -3,8 +3,14 @@ package application.batch.models.cnpj;
 import application.batch.models.FromTextFileModel;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.spark.sql.Column;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Partner
@@ -100,4 +106,20 @@ public class Partner extends FromTextFileModel {
      */
     @Getter @Setter
     private Short ageRange;
+
+    public static List<String> getColumnList(){
+        return Arrays.asList("basicCnpj","partnerType","partnerName","partnerDocument","partnerQualification","partnerStartDate","country","legalRepresentative","representativeName","representativeQualification","ageRange");
+    }
+
+    public static Seq<Column> getColumns(){
+        List<Column> columns = new ArrayList<>();
+        getColumnList().forEach(x -> {
+            columns.add(new Column(x));
+        });
+        return JavaConverters.asScalaBuffer(columns).toSeq();
+    }
+
+    public static String getSelectStatement(){
+        return String.join(",", getColumnList());
+    }
 }

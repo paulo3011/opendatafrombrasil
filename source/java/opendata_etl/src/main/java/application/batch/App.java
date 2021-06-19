@@ -7,10 +7,8 @@ import application.batch.pipeline.CnpjRaw;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
-import java.io.IOException;
-
 public class App {
-    public static void main(String[] args) throws IOException, ReflectiveOperationException {
+    public static void main(String[] args) throws Exception {
         System.out.println("Starting app program..");
         Parameters parameters = new Parameters(args);
 

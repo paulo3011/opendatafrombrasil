@@ -117,22 +117,29 @@ public class CnpjRaw implements IPipeline {
 
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters)
-            throws ReflectiveOperationException {
+            throws Exception {
         //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
+
+        if(parameters.getOutputFileType() == FileType.cnpj_raw)
+        {
+            //no transformations, can be used to backup in a better format
+            //not implemented yet - needs to read without change de datatypes or add columns, just read the original format and write it to output format
+            throw new Exception("Output format FileType.cnpj_raw not implemented yet!");
+        }
+
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
         parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");//
         parameters.setOutputFileFormat(FileFormat.orc);
 
-        //para debugar schema
-        //loadOrcTest(sparkSession);
+        debugSchemas(sparkSession);
 
         //this.loadTest(sparkSession);
 
         //this.analyzeRawData(sparkSession, parameters);
 
-        runTransformation(sparkSession,parameters,true);
+        //runTransformation(sparkSession,parameters,true);
 
 
     }
@@ -286,7 +293,6 @@ public class CnpjRaw implements IPipeline {
         return df;
     }
 
-
     @SuppressWarnings("unused")
     private <T> void debugDataSet(Dataset<T> ds) {
         //List<T> list = ds.collectAsList();
@@ -296,15 +302,15 @@ public class CnpjRaw implements IPipeline {
         System.out.println("*** total records: " + total);
     }
 
-    public void loadOrcTest(SparkSession spark){
+    public void debugSchemas(SparkSession spark){
         DataFrameReader reader = spark.read()
                 .format("orc")
                 ;
         //if(schema != null)
             //reader = reader.schema(schema);
 
-        //Dataset<Row> df = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\company\\part-00107-307ba805-562b-4471-9089-a3fadeb548ea-c000.snappy.orc");
-        //debugDataSet(df);
+        Dataset<Row> df = reader.load("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\2021-06-19\\company\\part-00000-1f74b08f-c39b-4fc5-b879-5369cc38e22f-c000.snappy.orc");
+        debugDataSet(df);
 
         //String establisment = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\establishment\\part-00319-35da67fe-1851-4628-93f6-9cd3d1e2b799-c000.snappy.orc";
         //Dataset<Row> df2 = reader.load(establisment);
@@ -318,9 +324,9 @@ public class CnpjRaw implements IPipeline {
         //Dataset<Row> df4 = reader.load(partner);
         //debugDataSet(df4);
 
-        String simple = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\simple_national\\part-00048-66866090-95bf-4e9f-8563-1287f9848d9a-c000.snappy.orc";
-        Dataset<Row> df5 = reader.load(simple);
-        debugDataSet(df5);
+        //String simple = "E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\orc\\simple_national\\part-00048-66866090-95bf-4e9f-8563-1287f9848d9a-c000.snappy.orc";
+        //Dataset<Row> df5 = reader.load(simple);
+        //debugDataSet(df5);
     }
 
     @SuppressWarnings("unused")
@@ -442,7 +448,7 @@ public class CnpjRaw implements IPipeline {
         }
         if(outputFormat == FileFormat.csv){
             //the same format as original
-            dfWriter.option("header","false");
+            dfWriter.option("header","true");
         }
 
         return dfWriter;
@@ -454,7 +460,7 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
+    public void runTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws Exception {
         runGenericCodeTransformation(sparkSession,parameters,cache);
         runPartnerTransformation(sparkSession,parameters,cache);
         runEstablishmentCompanyTransformation(sparkSession,parameters,cache);
@@ -469,7 +475,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runSimpleNationalTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, SIMPLE_NATIONAL_RAW_GLOB, SIMPLE_NATIONAL_FOLDER, SimpleNationalStringRawToModel.class, SimpleNational.class, cache);
-        sourceDf = trackErrors(sourceDf, parameters, SIMPLE_NATIONAL_FOLDER);
+        sourceDf = trackErrors(sourceDf, parameters, SIMPLE_NATIONAL_FOLDER, SimpleNational.getColumns());
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -485,7 +491,7 @@ public class CnpjRaw implements IPipeline {
         }
     }
 
-    public Dataset<Row> trackErrors(Dataset<Row> sourceDs, Parameters parameters, String datasetName){
+    public Dataset<Row> trackErrors(Dataset<Row> sourceDs, Parameters parameters, String datasetName, Seq<Column> columnsToReturn){
         boolean containDebugColumns = false;
         for (String c : sourceDs.columns()) {
             if (c.equals("rawData") || c.equals("parseErrorMessage")) {
@@ -494,17 +500,32 @@ public class CnpjRaw implements IPipeline {
             }
         }
 
-        if(!containDebugColumns)
+        if(!containDebugColumns) {
+            //theres no debug columns, so return the dataset
+            if(columnsToReturn != null)
+                return sourceDs.select(columnsToReturn);
             return sourceDs;
+        }
 
+        //create errors dataset
         List<Column> columns = Arrays.asList(new Column("rawData"),new Column("parseErrorMessage"));
         Dataset<Row> errors = sourceDs.select(JavaConverters.asScalaIteratorConverter(columns.iterator()).asScala().toSeq());
+        errors = errors.filter(errors.col("rawData").isNotNull());
+
+        //remove debug columns from the dataset
+        Dataset<Row> resultDataset = FromTextFileModel.dropDebugColumns(sourceDs);
+        //select the requested columns if requested
+        if(columnsToReturn != null)
+            resultDataset = resultDataset.select(columnsToReturn);
+
+        //save errors on disc if exists
+        if(errors.rdd().isEmpty())
+            return resultDataset;
 
         DataFrameWriter<Row> dfWriter = errors.write().format(FileFormat.parquet.toString().toLowerCase());
         dfWriter.mode(SaveMode.Overwrite);
         dfWriter.save(Paths.get(parameters.getInputPath(), "errors", datasetName).toString());
 
-        Dataset<Row> resultDataset = FromTextFileModel.dropDebugColumns(sourceDs);
         return resultDataset;
     }
 
@@ -516,9 +537,9 @@ public class CnpjRaw implements IPipeline {
      */
     public void runEstablishmentCompanyTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, ESTABLISHMENT_RAW_GLOB, ESTABLISHMENT_FOLDER, EstablishmentsStringRawToModel.class, Establishment.class, cache);
-        sourceDf = trackErrors(sourceDf, parameters, ESTABLISHMENT_FOLDER);
+        sourceDf = trackErrors(sourceDf, parameters, ESTABLISHMENT_FOLDER, Establishment.getColumns());
         Dataset<Row> companySourceDf  = this.getDataFrame(sparkSession, parameters, COMPANY_RAW_GLOB, COMPANY_FOLDER, CompanyStringRawToModel.class, Company.class, cache);
-        companySourceDf = trackErrors(companySourceDf, parameters, COMPANY_FOLDER);
+        companySourceDf = trackErrors(companySourceDf, parameters, COMPANY_FOLDER, Company.getColumns());
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -561,7 +582,7 @@ public class CnpjRaw implements IPipeline {
      */
     public void runPartnerTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws ReflectiveOperationException {
         Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_RAW_GLOB, PARTNER_FOLDER, PartnerStringRawToModel.class, Partner.class, cache);
-        sourceDf = trackErrors(sourceDf, parameters, PARTNER_FOLDER);
+        sourceDf = trackErrors(sourceDf, parameters, PARTNER_FOLDER, Partner.getColumns());
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -583,141 +604,38 @@ public class CnpjRaw implements IPipeline {
      * @param parameters App parameters
      * @param cache Save dataframe on cache if true
      */
-    public void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        runCityCodeTransformation(sparkSession, parameters, cache);
-        runCnaeCodeTransformation(sparkSession, parameters, cache);
-        runCountryCodeTransformation(sparkSession, parameters, cache);
-        runLegalNatureCodeTransformation(sparkSession, parameters, cache);
-        runPartnerQualificationCodeTransformation(sparkSession, parameters, cache);
+    public void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache) throws Exception {
+        runGenericCodeTransformation(sparkSession, parameters, CITY_CODE_RAW_GLOB, CITY_CODE_FOLDER, CityCodeStringRawToModel.class, CityCode.class);
+        runGenericCodeTransformation(sparkSession, parameters, CNAE_CODE_RAW_GLOB, CNAE_CODE_FOLDER, CnaeCodeStringRawToModel.class, CnaeCode.class);
+        runGenericCodeTransformation(sparkSession, parameters, COUNTRY_CODE_RAW_GLOB, COUNTRY_CODE_FOLDER, CountryCodeStringRawToModel.class, CountryCode.class);
+        runGenericCodeTransformation(sparkSession, parameters, LEGAL_NATURE_CODE_RAW_GLOB, LEGAL_NATURE_CODE_FOLDER, LegalNatureCodeStringRawToModel.class, LegalNatureCode.class);
+        runGenericCodeTransformation(sparkSession, parameters, PARTNER_QUALIFICATION_CODE_RAW_GLOB, PARTNER_QUALIFICATION_CODE_FOLDER, PartnerQualificationCodeStringRawToModel.class, PartnerQualificationCode.class);
     }
 
     /**
-     * Execute the City Codes Transformation.
-     * @param sparkSession Spark Session
-     * @param parameters App parameters
-     * @param cache Save dataframe on cache if true
+     * Run a generic code transformation.
+     * @param <T> Model type
+     * @param <U> Mapper type
+     * @param sparkSession Spark session
+     * @param parameters App params
+     * @param pathGlobFilter glob filter to filter files to read
+     * @param defautFolder defaut folder to read files
+     * @param mapperClass mapper to transform raw data to model
+     * @param modelClass target model class for the mapper
+     * @throws ReflectiveOperationException ReflectiveOperationException
+     * @see <a href="https://spark.apache.org/docs/latest/rdd-programming-guide.html">textfile options</a>
      */
-    public void runCityCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CITY_CODE_RAW_GLOB, CITY_CODE_FOLDER, cache);
-        sourceDf = trackErrors(sourceDf, parameters, CITY_CODE_FOLDER);
-
-        if(parameters.getOutputFileType() == FileType.cnpj_raw)
-        {
-            //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), CITY_CODE_FOLDER).toString());
-        }
+    private <T extends GenericCode, U extends FlatMapFunction<Iterator<String>, T>> void runGenericCodeTransformation(SparkSession sparkSession, Parameters parameters, String pathGlobFilter, String defautFolder, final Class<U> mapperClass, final Class<T> modelClass)
+            throws Exception
+    {
+        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, pathGlobFilter, defautFolder, mapperClass, modelClass, true);
+        sourceDf = trackErrors(sourceDf, parameters, defautFolder, GenericCode.getColumns());
 
         if(parameters.getOutputFileType() == FileType.cnpj_lake)
         {
             //transform to lake model
-            Dataset<CityCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CityCode.class), Encoders.bean(CityCode.class));
-            DataFrameWriter<CityCode> dfWriter = getDataFrameWriter(dataset, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), CITY_CODE_FOLDER).toString());
-        }
-    }
-
-    /**
-     * Execute the CNAE Codes Transformation.
-     * @param sparkSession Spark Session
-     * @param parameters App parameters
-     * @param cache Save dataframe on cache if true
-     */
-    public void runCnaeCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, CNAE_CODE_RAW_GLOB, CNAE_CODE_FOLDER, cache);
-        sourceDf = trackErrors(sourceDf, parameters, CNAE_CODE_FOLDER);
-
-        if(parameters.getOutputFileType() == FileType.cnpj_raw)
-        {
-            //no transformations, can be used to backup in a better format
             DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), CNAE_CODE_FOLDER).toString());
-        }
-
-        if(parameters.getOutputFileType() == FileType.cnpj_lake)
-        {
-            //transform to lake model
-            Dataset<CnaeCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CnaeCode.class), Encoders.bean(CnaeCode.class));
-            DataFrameWriter<CnaeCode> dfWriter = getDataFrameWriter(dataset, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), CNAE_CODE_FOLDER).toString());
-        }
-    }
-
-    /**
-     * Execute the Country Codes Transformation.
-     * @param sparkSession Spark Session
-     * @param parameters App parameters
-     * @param cache Save dataframe on cache if true
-     */
-    public void runCountryCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, COUNTRY_CODE_RAW_GLOB, COUNTRY_CODE_FOLDER, cache);
-        sourceDf = trackErrors(sourceDf, parameters, COUNTRY_CODE_FOLDER);
-
-        if(parameters.getOutputFileType() == FileType.cnpj_raw)
-        {
-            //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), COUNTRY_CODE_FOLDER).toString());
-        }
-
-        if(parameters.getOutputFileType() == FileType.cnpj_lake)
-        {
-            //transform to lake model
-            Dataset<CountryCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(CountryCode.class), Encoders.bean(CountryCode.class));
-            DataFrameWriter<CountryCode> dfWriter = getDataFrameWriter(dataset, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), COUNTRY_CODE_FOLDER).toString());
-        }
-    }
-
-    /**
-     * Execute the Legal Nature Codes Transformation.
-     * @param sparkSession Spark Session
-     * @param parameters App parameters
-     * @param cache Save dataframe on cache if true
-     */
-    public void runLegalNatureCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, LEGAL_NATURE_CODE_RAW_GLOB, LEGAL_NATURE_CODE_FOLDER, cache);
-        sourceDf = trackErrors(sourceDf, parameters, LEGAL_NATURE_CODE_FOLDER);
-
-        if(parameters.getOutputFileType() == FileType.cnpj_raw)
-        {
-            //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), LEGAL_NATURE_CODE_FOLDER).toString());
-        }
-
-        if(parameters.getOutputFileType() == FileType.cnpj_lake)
-        {
-            //transform to lake model
-            Dataset<LegalNatureCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(LegalNatureCode.class), Encoders.bean(LegalNatureCode.class));
-            DataFrameWriter<LegalNatureCode> dfWriter = getDataFrameWriter(dataset, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), LEGAL_NATURE_CODE_FOLDER).toString());
-        }
-    }
-
-    /**
-     * Execute the Partner Qualification Codes Transformation.
-     * @param sparkSession Spark Session
-     * @param parameters App parameters
-     * @param cache Save dataframe on cache if true
-     */
-    public void runPartnerQualificationCodeTransformation(SparkSession sparkSession, Parameters parameters, boolean cache){
-        Dataset<Row> sourceDf  = this.getDataFrame(sparkSession, parameters, PARTNER_QUALIFICATION_CODE_RAW_GLOB, PARTNER_QUALIFICATION_CODE_FOLDER, cache);
-        sourceDf = trackErrors(sourceDf, parameters, PARTNER_QUALIFICATION_CODE_FOLDER);
-
-        if(parameters.getOutputFileType() == FileType.cnpj_raw)
-        {
-            //no transformations, can be used to backup in a better format
-            DataFrameWriter<Row> dfWriter = getDataFrameWriter(sourceDf, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_QUALIFICATION_CODE_FOLDER).toString());
-        }
-
-        if(parameters.getOutputFileType() == FileType.cnpj_lake)
-        {
-            //transform to lake model
-            Dataset<PartnerQualificationCode> dataset = sourceDf.map(new GenericCodeRawToModel<>(PartnerQualificationCode.class), Encoders.bean(PartnerQualificationCode.class));
-            DataFrameWriter<PartnerQualificationCode> dfWriter = getDataFrameWriter(dataset, parameters);
-            dfWriter.save(Paths.get(parameters.getInputPath(), PARTNER_QUALIFICATION_CODE_FOLDER).toString());
+            dfWriter.save(Paths.get(parameters.getInputPath(), defautFolder).toString());
         }
     }
 

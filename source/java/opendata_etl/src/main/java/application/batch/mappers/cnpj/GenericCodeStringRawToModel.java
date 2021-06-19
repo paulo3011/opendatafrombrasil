@@ -34,7 +34,7 @@ public class GenericCodeStringRawToModel<T extends GenericCode> implements FlatM
             record.setDescription(CnpjUtils.fixStringValues(values[1]));
         }
         catch (Exception ex){
-            System.out.printf("date parser error: %s: , row data: %s", ex.getMessage(), textLine);
+            System.out.printf("GenericCode parser error: %s: , row data: %s", ex.getMessage(), textLine);
             record.setRawData(textLine);
             record.setParseErrorMessage(ex.getMessage());
         }

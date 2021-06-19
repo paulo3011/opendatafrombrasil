@@ -132,6 +132,10 @@ public class CnpjUtils {
         try {
             NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
             String numberString = fixStringValues(value);
+
+            BigDecimal test = new BigDecimal(nf.parse(numberString).toString());
+            test.setScale(2);
+
             return new BigDecimal(nf.parse(numberString).toString());
         }
         catch (Exception ex){

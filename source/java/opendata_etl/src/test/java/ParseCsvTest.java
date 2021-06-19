@@ -1,6 +1,22 @@
+import application.batch.mappers.cnpj.CompanyStringRawToModel;
+import application.batch.models.cnpj.Company;
 import application.batch.utils.CnpjUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.*;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class ParseCsvTest {
     @Test
@@ -134,4 +150,79 @@ public class ParseCsvTest {
         assert dt != null;
         Assert.assertEquals("2021-06-14", dt.toString());
     }
+
+    //
+    @Test
+    public void listToSeq(){
+        //yyyymmdd
+        List<String> dateAsString = Arrays.asList("field1", "filed2");
+        Seq<String> cols = JavaConverters.asScalaBuffer(dateAsString).toSeq();
+        //JavaConverters.asScalaIteratorConverter(columns.iterator()).asScala().toSeq()
+    }
+
+    @Test
+    public void testBigDecimalScale() throws ParseException {
+        NumberFormat nf = NumberFormat.getInstance(new Locale("pt", "BR"));
+        String numberString = "000000010501,03";
+        Number number = nf.parse(numberString);
+
+        BigDecimal value = new BigDecimal(number.toString());
+        BigDecimal newValue = value.setScale(2);
+        String strValue = newValue.toString();
+
+        String maxNumberString = "900000099991,56";
+        Number maxNumber = nf.parse(maxNumberString);
+        BigDecimal maxValue = new BigDecimal(maxNumber.toString());
+        BigDecimal newMaxValue = maxValue.setScale(2);
+        String strMaxValue = newMaxValue.toString();
+    }
+
+    @Test
+    public void testOrcSchemaWithBigdecimal(){
+        SparkConf conf = new SparkConf().setAppName("SparkSample").setMaster("local[*]");
+        JavaSparkContext jsc = new JavaSparkContext(conf);
+        SQLContext sqc = new SQLContext(jsc);
+        // sample data
+        List<String> data = new ArrayList<String>();
+        data.add("dev, engg, 10000");
+        data.add("karthik, engg, 20000");
+        // DataFrame
+        Dataset<Row> df = sqc.createDataset(data, Encoders.STRING()).toDF();
+        df.printSchema();
+        df.show();
+        // Convert
+        Dataset<Row> df1 = df.selectExpr("split(value, ',')[0] as name", "split(value, ',')[1] as degree","split(value, ',')[2] as salary");
+        df1.printSchema();
+        df1.show();
+    }
+
+    @Test
+    public void testOrcSchemaWithBigdecimal2(){
+        SparkConf conf = new SparkConf().setAppName("SparkSample").setMaster("local[*]");
+        SparkSession sparkSession = SparkSession
+                .builder()
+                .config(conf)
+                .getOrCreate();
+        /*
+        "41273603";"GRAFLINE ACESSORIOS  GRAFICOS LTDA";"2062";"49";"000000010501,03";"01";""
+        "41273604";"RUMO - ESTUDIO DE DANCA LTDA";"2062";"49";"900000099991,56";"01";""
+         */
+
+        String[] lines = {
+           "\"41273603\";\"GRAFLINE ACESSORIOS  GRAFICOS LTDA\";\"2062\";\"49\";\"000000010501,03\";\"01\";\"\"",
+            "\"41273604\";\"RUMO - ESTUDIO DE DANCA LTDA\";\"2062\";\"49\";\"900000099991,56\";\"01\";\"\""
+        };
+
+        // Seq<String> seqs = JavaConverters.asScalaBuffer(Arrays.asList(lines)).toSeq();
+        JavaSparkContext sparkContext = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+
+        JavaRDD<String> csvLines = sparkContext.parallelize(Arrays.asList(lines));
+        JavaRDD<Company> est = csvLines.mapPartitions(new CompanyStringRawToModel());
+        Dataset<Row> df = sparkSession.createDataFrame(est, Company.class).select(Company.getColumns());
+
+        df.printSchema();
+        df.show(3);
+
+    }
+
 }
