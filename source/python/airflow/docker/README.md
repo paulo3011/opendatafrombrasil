@@ -3,28 +3,28 @@
 1. Clone the github official repository
 
 ```shell
-# enter to your preferred path
-cd ~/projects/external
-# clone the repo
-git clone https://github.com/apache/airflow.git
+$ # enter to your preferred path
+$ cd ~/projects/external
+$ # clone the repo
+$ git clone https://github.com/apache/airflow.git
 ```
 
 2. Checkout to the stable version that you want
 
 ```shell
-git checkout v2-0-stable
+$ git checkout v2-0-stable
 ```
 
 3. Enter on airflow folder
 
 ```shell
-cd ~/projects/external/airflow
+$ cd ~/projects/external/airflow
 ```
 
 4. Check if is up to date
 
 ```shell
-git status
+$ git status
 # The result needs to be:
 # On branch v2-0-stable
 # Your branch is up to date with 'origin/v2-0-stable'.
@@ -78,6 +78,81 @@ Notes about configurations used:
 - INSTALL_FROM_DOCKER_CONTEXT_FILES:
 
     We can seet this value to true in case we want to install .whl .tar.gz packages placed in the docker-context-files folder. This can be done for both - additional packages you want to install and for airflow as well (you have to set INSTALL_FROM_PYPI to false in this case)
+
+# Starting docker compose airflow dev env
+
+To start airflow do:
+
+```shell
+$ # enter to your project path
+$ cd ~/projects/opendatafrombrasil/source/python/airflow/docker
+$ docker-compose -up
+```
+
+To start airflow scheduler do:
+
+```shell
+$ # see the airflow container id
+$ docker ps
+$ # login on airflow instance
+$ docker exec -it container_id bash
+$ # start airflow scheduler
+$ airflow scheduler &
+$ # Access on browser http://localhost:8081/
+```
+
+# Airflow cli commands
+
+```shell
+usage: airflow [-h] GROUP_OR_COMMAND ...
+
+positional arguments:
+  GROUP_OR_COMMAND
+
+    Groups:
+      celery         Celery components
+      config         View configuration
+      connections    Manage connections
+      dags           Manage DAGs
+      db             Database operations
+      kubernetes     Tools to help run the KubernetesExecutor
+      pools          Manage pools
+      providers      Display providers
+      roles          Manage roles
+      tasks          Manage tasks
+      users          Manage users
+      variables      Manage variables
+
+    Commands:
+      cheat-sheet    Display cheat sheet
+      info           Show information about current Airflow and environment
+      kerberos       Start a kerberos ticket renewer
+      plugins        Dump information about loaded plugins
+      rotate-fernet-key
+                     Rotate encrypted connection credentials and variables
+      scheduler      Start a scheduler instance
+      sync-perm      Update permissions for existing roles and DAGs
+      version        Show the version
+      webserver      Start a Airflow webserver instance
+
+optional arguments:
+  -h, --help         show this help message and exit
+```
+
+To test load and run the dag file you can use:
+
+```shell
+$ # airflow dags test [dag_id] 2021-04-13
+$ # sample:
+$ airflow dags test dag_id 2021-04-13
+```
+
+To check if some dag file is without error you can do:
+
+```shell
+$ docker exec -it container_id bash
+$ python dags/dag_file.py
+```
 
 # References
 

@@ -2,3 +2,4 @@ metastore_db
 derby.log
 **/__pycache__/
 runtime/debug.py
+source/python/airflow/runtime/dags/test.py
