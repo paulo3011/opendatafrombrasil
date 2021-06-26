@@ -5,12 +5,9 @@ Leia em outro idioma (Read this in other language):
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README-en-US.md)
 [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](README.md)
 
-This project was made to explore the Brazil open data about companies.
-
-
 ## Summary
 
-This project was designed to explore Brazil's open data on companies.
+This project was made to explore the Brazil open data about companies.
 
 This project followed the following steps:
 
@@ -307,3 +304,6 @@ https://concla.ibge.gov.br/images/concla/downloads/revisao2007/PropCNAE20/CNAE20
 - https://github.com/georgevbsantiago/qsacnpj/
 - https://www.kaggle.com/hugomathien/soccer/home
 - https://www.w3schools.com/python/python_intro.asp
+- https://github.com/databricks/spark-csv/blob/master/src/main/scala/com/databricks/spark/csv/util/TextFile.scala
+- https://github.com/databricks/spark-csv/blob/master/src/test/scala/com/databricks/spark/csv/util/TextFileSuite.scala
+- https://github.com/wuga214/TEACHING_OSU_DocAnalysis_Fall2015_Assign4/blob/master/code/a4example/BadRecordCount.java
