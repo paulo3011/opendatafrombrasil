@@ -63,7 +63,4 @@ class CnpjSqlQueries:
     """)
 
     drop_create_stage_tables = drop_stage_tables + create_stage_tables
-
-    load_partner = ("TRUNCATE TABLE open_data.dim_partner", "INSERT INTO open_data.dim_partner SELECT * FROM open_data.stage_dim_partner")
-
-    
+   

@@ -40,11 +40,31 @@ drop_stage_tables = RedshiftRunOperator(task_id="drop_stage_tables", sql=CnpjSql
 # copy form s3 to stage table and then to target table
 # stage_table_name, source, target_table, load_command, iam_role="{{var.value.redshift_iam_role}}", db_api_hook=PostgresHook("redshift")
 load_partner_table = RedshiftLoadOperator(
-  task_id="load_partner_table", 
+  task_id="load_dim_partner", 
   stage_table_name = "open_data.stage_dim_partner",
   source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/partner/part-", 
   target_table = "open_data.dim_partner",
-  load_command=CnpjSqlQueries.load_partner,
   dag=dag)
 
-start_operator >> create_stage_tables >> load_partner_table >> drop_stage_tables >> end_operator
+load_simple_national_table = RedshiftLoadOperator(
+  task_id="load_dim_simple_national", 
+  stage_table_name = "open_data.dim_simple_national",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/simple_national/part-", 
+  target_table = "open_data.dim_simple_national",
+  dag=dag)  
+
+load_company_table = RedshiftLoadOperator(
+  task_id="load_dim_company", 
+  stage_table_name = "open_data.dim_company",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/company/part-", 
+  target_table = "open_data.dim_company",
+  dag=dag)   
+
+load_fact_establishment_table = RedshiftLoadOperator(
+  task_id="load_fact_establishment", 
+  stage_table_name = "open_data.fact_establishment",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/establishment/part-", 
+  target_table = "open_data.fact_establishment",
+  dag=dag)   
+
+start_operator >> create_stage_tables >> [load_partner_table, load_simple_national_table, load_company_table, load_fact_establishment_table] >> drop_stage_tables >> end_operator

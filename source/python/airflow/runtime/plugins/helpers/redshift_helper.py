@@ -69,7 +69,10 @@ def get_orc_copy_command(stage_table_name, source, iam_role="{{var.value.redshif
 
         commands = commands + (copy_command,)
 
-        return commands        
+        return commands
+
+def _create_default_load_command(stage_table, target_table)            :
+    return ("TRUNCATE TABLE {}".format(target_table), "INSERT INTO {} SELECT * FROM {}".format(target_table, stage_table))
 
 def _create_stage_table_command(table_name, target_table, selected_fields="*"):
         """

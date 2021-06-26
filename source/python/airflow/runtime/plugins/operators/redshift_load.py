@@ -1,7 +1,7 @@
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.models.baseoperator import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from helpers.redshift_helper import get_orc_copy_command
+from helpers.redshift_helper import get_orc_copy_command, _create_default_load_command
 
 class RedshiftLoadOperator(BaseOperator):
 
@@ -13,7 +13,7 @@ class RedshiftLoadOperator(BaseOperator):
                  stage_table_name,
                  source,                 
                  target_table,
-                 load_command,
+                 load_command=None,
                  iam_role="{{var.value.redshift_iam_role}}",
                  db_api_hook=PostgresHook("redshift"),
                  *args, **kwargs):
@@ -41,6 +41,10 @@ class RedshiftLoadOperator(BaseOperator):
 
         self.db_api_hook.run(copy_cmd)
 
-        self.log.info("load command %s", self.load_command)
+        load_command = self.load_command
+        if load_command is None:
+            load_command = _create_default_load_command(self.stage_table_name, self.target_table)
 
-        self.db_api_hook.run(self.load_command)               
+        self.log.info("load command %s", load_command)
+
+        self.db_api_hook.run(load_command)               
