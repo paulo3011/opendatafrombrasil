@@ -130,8 +130,8 @@ public class CnpjRaw implements IPipeline {
         }
 
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
-        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
+        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");//
         parameters.setOutputFileFormat(FileFormat.orc);
 

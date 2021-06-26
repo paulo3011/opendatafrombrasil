@@ -10,6 +10,9 @@ import org.junit.Test;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -18,7 +21,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class ParseCsvTest {
+public class ParseCsvTest implements Serializable {
+
+    private final String charset8859 = "ISO-8859-1";
+    private final String charsetUtf8 = "UTF-8";
+    private String partnerFile8859 = "src/test/resources/D10410.QUALSCSV";
+
     @Test
     public void SplitLine_1(){
         String textLine = "\"36452531\";\"0001\";\"62\";\"1\";\"AMPPLA CREATIVE STUDIO\";\"2\";\"20200221\";\"0\";\"\";\"\";\"20200221\";\"1821100\";\"5819100,5811500,5812302,1813001,5912099,5812301,7319002,5813100\";\"ESTRADA\";\"DO MANDU\";\"560\";\"EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805\";\"SAO MARCOS\";\"41250400\";\"BA\";\"3849\";\"71\";\"99479533\";\"\";\"\";\"\";\"\";\"JONATASMA@GMAIL.COM\";\"\";\"\"";
@@ -231,10 +239,25 @@ public class ParseCsvTest {
 
     }
 
-    private <T> void debugDataSet(Dataset<T> ds) {
-        ds.show(5);
-        ds.printSchema();
+    @Test
+    public void getTextWithCharset() throws UnsupportedEncodingException, FileNotFoundException {
+        SparkSession sparkSession = getOrCreateSparkSession();
+        JavaSparkContext sparkContext = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+
+        JavaRDD<String> csvLines = sparkContext.textFile(partnerFile8859);
+        JavaRDD<String> est = csvLines.map(line -> {
+            System.out.println(line);
+            //Charset.forName("windows-1252")
+            //line.getBytes(Charset.forName("windows-1252"));
+            //final byte[] strBytes = line.getBytes(charsetUtf8);
+            //String newStr = new String(strBytes, charset8859);
+            //String newStrUft8 = new String(newStr.getBytes(), charsetUtf8);
+            return line;
+        });
+
+        est.collect();
     }
+
 
     public SparkSession getOrCreateSparkSession(){
         SparkConf conf = new SparkConf().setAppName("SparkSample").setMaster("local[*]");
@@ -242,6 +265,7 @@ public class ParseCsvTest {
                 .builder()
                 .config(conf)
                 .getOrCreate();
+
         return sparkSession;
     }
 
