@@ -67,4 +67,42 @@ load_fact_establishment_table = RedshiftLoadOperator(
   target_table = "open_data.fact_establishment",
   dag=dag)   
 
-start_operator >> create_stage_tables >> [load_partner_table, load_simple_national_table, load_company_table, load_fact_establishment_table] >> drop_stage_tables >> end_operator
+load_dim_city_code_table = RedshiftLoadOperator(
+  task_id="load_dim_city_code", 
+  stage_table_name = "open_data.dim_city_code",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/city_code/part-", 
+  target_table = "open_data.dim_city_code",
+  dag=dag)   
+
+load_dim_cnae_table = RedshiftLoadOperator(
+  task_id="load_dim_cnae", 
+  stage_table_name = "open_data.dim_cnae",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/cnae_code/part-", 
+  target_table = "open_data.dim_cnae",
+  dag=dag)   
+
+load_dim_country_code = RedshiftLoadOperator(
+  task_id="load_dim_country_code", 
+  stage_table_name = "open_data.dim_country_code",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/country_code/part-", 
+  target_table = "open_data.dim_country_code",
+  dag=dag)    
+
+load_dim_legal_nature = RedshiftLoadOperator(
+  task_id="load_dim_legal_nature", 
+  stage_table_name = "open_data.dim_legal_nature",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/legal_nature_code/part-", 
+  target_table = "open_data.dim_legal_nature",
+  dag=dag)    
+
+load_dim_partner_qualification = RedshiftLoadOperator(
+  task_id="load_dim_partner_qualification", 
+  stage_table_name = "open_data.dim_partner_qualification",
+  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/partner_qualification_code/part-", 
+  target_table = "open_data.dim_partner_qualification",
+  dag=dag)     
+
+# dim_tasks = [load_dim_partner_qualification, load_dim_legal_nature, load_dim_country_code, load_dim_city_code_table, load_dim_cnae_table]
+# facts_tasks = [load_partner_table, load_simple_national_table, load_company_table, load_fact_establishment_table]
+
+start_operator >> create_stage_tables >> [load_dim_partner_qualification, load_dim_legal_nature, load_dim_country_code, load_dim_city_code_table, load_dim_cnae_table, load_partner_table, load_simple_national_table, load_company_table, load_fact_establishment_table] >> drop_stage_tables >> end_operator
