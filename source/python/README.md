@@ -1,5 +1,7 @@
 # Environment setup
 
+0. Install python version 3.8.5 
+
 1. Create a python virtual enviornment 
 
 ```shell
