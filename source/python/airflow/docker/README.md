@@ -35,17 +35,16 @@ git status
 ```shell
 docker build . \
   --build-arg PYTHON_BASE_IMAGE="python:3.8-slim-buster" \
-  --build-arg AIRFLOW_PIP_VERSION=21.0.1 \
+  --build-arg AIRFLOW_PIP_VERSION=21.1.3 \
   --build-arg PYTHON_MAJOR_MINOR_VERSION=3.8 \
   --build-arg AIRFLOW_INSTALLATION_METHOD="apache-airflow" \
   --build-arg AIRFLOW_VERSION="2.0.1" \
   --build-arg AIRFLOW_INSTALL_VERSION="==2.0.1" \
-  --build-arg AIRFLOW_CONSTRAINTS_REFERENCE="constraints-2-0" \
   --build-arg AIRFLOW_SOURCES_FROM="empty" \
   --build-arg AIRFLOW_SOURCES_TO="/empty" \
   --build-arg INSTALL_MYSQL_CLIENT="false" \
   --build-arg AIRFLOW_EXTRAS="amazon,http,postgres,sqlite" \
-  --tag moreira-udacity-airlfow-v2
+  --tag moreira-opendata-airlfow-v2
 ```
 
 Notes about configurations used:
