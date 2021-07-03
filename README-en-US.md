@@ -53,28 +53,28 @@ Arquivos e exemplos:
 __Establishments__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#estabelecimentos)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#estabelecimentos)
 
 </br>
 
 __Companies__
 
 ![csv_empresas.jpg](./assets/images/cnpj/csv_empresas.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#empresas)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#empresas)
 
 </br>
 
 __Partners__
 
 ![csv_socios.jpg](./assets/images/cnpj/csv_socios.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#sócios)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#sócios)
 
 </br>
 
 __CNAE - National Classification of Economic Activities__
 
 ![csv_cnaes.jpg](./assets/images/cnpj/csv_cnaes.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#cnae---classificação-nacional-de-atividades-econômicas)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#cnae---classificação-nacional-de-atividades-econômicas)
 
 _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
 
@@ -83,7 +83,7 @@ _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.b
 __Legal Nature__
 
 ![csv_naturezajuridica.jpg](./assets/images/cnpj/csv_naturezajuridica.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#natureza-jurídica)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#natureza-jurídica)
 
 _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
 
@@ -92,28 +92,28 @@ _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.b
 __Member Qualification__
 
 ![csv_qualificacao.jpg](./assets/images/cnpj/csv_qualificacao.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#qualificação-do-sócio)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#qualificação-do-sócio)
 
 </br>
 
 __City Code__
 
 ![csv_municipio.jpg](./assets/images/cnpj/csv_municipio.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#código-do-município)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#código-do-município)
 
 </br>
 
 __Country code__
 
 ![csv_pais.jpg](./assets/images/cnpj/csv_pais.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#código-do-país)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#código-do-país)
 
 </br>
 
 __Data from the National Simple__
 
 ![csv_simples.jpg](./assets/images/cnpj/csv_simples.jpg)
-[Field Dictionary](./assets/docs/database/dictionary.md#dados-do-simples-nacional)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#dados-do-simples-nacional)
 
 </br>
 
