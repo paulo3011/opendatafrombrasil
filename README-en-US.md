@@ -246,6 +246,15 @@ return nf.parse(numberString).toString();
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
 
+
+## 4. Run ETL to model the data
+
+![airflow.jpg](./assets/images/cnpj/airflow_data_dag_2.jpg)
+
+## 5. Describe and document the Project
+
+### Defending Decisions
+
 __Distribution strategy__:
 
 Node size: 1 x dc2.large (160 GB storage) com 2 vCPU (2 slice), 15 GiB RAM
@@ -283,14 +292,13 @@ dim_partner_qualification|68      |
 
 As we know the frequent access pattern, we defined the following strategy:
 
-- Was not used "Even" distribution because all tables can be joined and the high cost to do this operation
-- Was used "All" distribution for small tables to speed up joins (dim_city_code, dim_cnae, dim_country_code, dim_legal_nature, dim_partner_qualification)
+- Was not used "Even" distribution because all tables can be joined, and the cost is high to do this operation- Was used "All" distribution for small tables to speed up joins (dim_city_code, dim_cnae, dim_country_code, dim_legal_nature, dim_partner_qualification)
 - Was used KEY distribution for larger tables to put similar values in the same slice and speed up queries
-- Was distributed dim_company, dim_simple_national, dim_partner and fact_establishment on the joining key (basiccnpj) to eliminates shuffling. This column is good because all information about one company is distributed beetwenn this tables and this informations is joined by this key.
+- Was distributed dim_company, dim_simple_national, dim_partner and fact_establishment on the joining key (basiccnpj) to eliminates shuffling. This column is good because all information about one company is distributed between these tables and this information is joined by this key.
 
 Sorting strategy:
 
-Was used sorting key to minimezes the query time.
+It was used sorting key to minimizes the query time.
 
 "Sorting enables efficient handling of range-restricted predicates. Amazon Redshift stores columnar data in 1 MB disk blocks. The min and max values for each block are stored as part of the metadata. If query uses a range-restricted predicate, the query processor can use the min and max values to rapidly skip over large numbers of blocks during table scans." (https://docs.aws.amazon.com/redshift/latest/dg/t_Sorting_data.html)
 
@@ -301,23 +309,43 @@ Frequent queries:
 
 SORTKEY considerations:
 
-- Was sorted by DISTKEY to speed up the join with related tables (dim and facts)
+- Was sorted by DISTKEY to speed up the join with related tables (dim and facts tables)
 - Was sorted by the frequent query filters (city, cnae, country, legal nature, matrix, companysize and partner qualification, etc) to speed up query time
 - I choose COMPOUND SORTKEY because the data will be sorted in the same order that the sortkey columns and the table filter will be probably done by sortkey columns and the type INTERLEAVED isn't a good choose for columns like datetime and autoincrements id's
 
+__Redshift__
 
+Redshift was used to be the data warehouse for the following reasons:
 
-# Application functional requirements:
+- Can easily support thousands of concurrent users and concurrent queries, with consistently fast query performance
+- Can load data in columnar formats and execute queries in a parallel and optimized way (Massively Parallel Processing - MPP)
+- Supports optimized file formats like ORC and PARQUET
+- Redshift lets you easily save the results of your queries back to your S3 data lake using open formats, like Apache Parquet
+- Allows scale up and scale down
 
-- Transform from source to destination format
-- Allow to create custom transformation implementations in the future
-    - By default a pipeline using dataframe is used
-- Allow setting spark settings via:
-    - command line (spark-submit)
-    - application parameters
-- Allow to define the settings by read/write format (source/destination) via:
-    - application parameters
-- Allow to select the transformation pipeline according to the source and destination parameters
+Seealso: https://aws.amazon.com/redshift/features/concurrency-scaling/?nc=sn&loc=2&dn=3
+
+__Airflow__
+
+Airflow was used to orchestrate the jobs for several reasons:
+
+- Allow schedule, monitoring and view the whole history of executions
+- Allow visualize the workflow executions and logs
+- Stable and widely used tool
+- Allows customization through the creation of custom plugins
+- Allows scale up
+
+__Apache Spark__
+
+Apache Spark was used for several reasons:
+
+- The dataset is not small and needs some tool that can be able to handle it
+- Apache Spark is a unified analytics engine for large-scale data processing, stable and widely used tool
+- Spark offers over 80 high-level operators that make it easy to build parallel apps
+- Apache Spark achieves high performance for both batch and streaming data, using a state-of-the-art DAG scheduler, a query optimizer, and a physical execution engine;
+- Spark runs on Hadoop, Apache Mesos, Kubernetes, standalone, or in the cloud. It can access diverse data sources;
+
+Seealso: https://spark.apache.org/
 
 # Future improvements
 
