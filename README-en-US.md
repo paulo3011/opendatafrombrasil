@@ -41,14 +41,14 @@ __CNPJ Open Data__
 
 **Feature**|**Description**|**Status**
 -----|:-----:|:-----:
-Periodicidade atualização:|mensal
-Formato dados:|csv
-Origem:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/dados-publicos-cnpj)|![Website](https://img.shields.io/website?url=http%3A%2F%2F200.152.38.155%2FCNPJ%2F)
-Layout:|[clique aqui](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf)
+Update frequency:|monthly
+data format:|csv
+Origin:|[Click here](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/dados-publicos-cnpj)|![Website](https://img.shields.io/website?url=http%3A%2F%2F200.152.38.155%2FCNPJ%2F)
+Layout:|[Click here](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/arquivos/NOVOLAYOUTDOSDADOSABERTOSDOCNPJ.pdf)
 
 </br>
 
-Arquivos e exemplos:
+Files and examples:
 
 __Establishments__
 
