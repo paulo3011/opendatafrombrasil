@@ -18,6 +18,7 @@ The write up describes a logical approach to this project under the following sc
 ### Defending Decisions
 
 [pending] The choice of tools, technologies, and data model are justified well.
+[] fix table fields and distributions keys
 
 
 ## Execution
@@ -28,7 +29,7 @@ The write up describes a logical approach to this project under the following sc
 
 ### Quality Checks
 
-[doing] The project includes at least two data quality checks.
+[ok] The project includes at least two data quality checks.
 
 ### Data Model
 
