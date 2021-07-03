@@ -249,6 +249,20 @@ return nf.parse(numberString).toString();
 
 ## 4. Run ETL to model the data
 
+1. Run Spark job to process CSV files and create ORC files
+
+```shell
+# Running on spark cluster or local mode
+spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format orc
+# or locally
+java -jar opendata_etl-1.0.jar --spark-conf spark.master=local[*],spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format parquet
+```
+Sample result:
+
+![spark_sample_2.jpg](./assets/images/cnpj/spark_sample_2.jpg)
+
+After save spark output on s3, manualy run airflow dag to load the ORC files into Redshift.
+
 ![airflow.jpg](./assets/images/cnpj/airflow_data_dag_2.jpg)
 
 ## 5. Describe and document the Project
