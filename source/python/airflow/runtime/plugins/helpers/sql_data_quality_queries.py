@@ -1,7 +1,8 @@
 class SqlDataQualityQueries:
-    sample_check = ("""
-    -- Make sure all song is unique on dim_song table
-    -- Result expected: none song is duplicate on dim_song table
-    SELECT song_id, COUNT(0) AS total_duplicated FROM dim_song group by song_id HAVING COUNT(0) > 1 LIMIT 1
-    ;
-    """, "== 0", "")
+    establisment_company_relation_check = ("""
+    -- looks for registration without relation with compay
+    -- for have a database with full information needs to return zero (establisment + company)
+    SELECT count(e.basiccnpj) as total_without_relation from open_data.fact_establishment e
+    LEFT JOIN open_data.dim_company c ON c.basiccnpj = e.basiccnpj 
+    WHERE e.matrixbranch=1 and c.basiccnpj is null;
+    """, "== 0", "")    

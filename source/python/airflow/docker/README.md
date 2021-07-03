@@ -184,7 +184,7 @@ Sampla values:
 - Conn Type: Postgres
 - Host: redshift-cluster.[yourpath].[region].redshift.amazonaws.com
 - Schema: dev
-- Login: opendata_airflow
+- Login: opendatauser_airflow
 - Password: yourpass
 - Port: 5439
 ```

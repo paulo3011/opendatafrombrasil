@@ -91,3 +91,23 @@ def _create_stage_table_command(table_name, target_table, selected_fields="*"):
             )    
 
         return copy_command
+
+def create_intersect_total_test(first_table, second_table):
+    """
+    Create a data quality test for redshift who checks if the total of register in
+    the first table is the same as the second table.
+    The result must be zero (if both tables are empty) or greater than zero (if not empty).
+    If it return None, something is wrong.
+
+    :param first_table: the first table name.
+    :type first_table: str    
+
+    :param second_table: the second table name.
+    :type second_table: str      
+    """
+    return ("""SELECT * FROM
+    (
+	    SELECT count(0) as total_records FROM {}
+	    INTERSECT	
+	    SELECT count(0) as total_records FROM {}
+    );""".format(first_table, second_table), "== 1", "> 0") 

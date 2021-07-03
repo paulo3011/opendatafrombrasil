@@ -3,16 +3,6 @@ import os
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from sample_operators.hello_operator import HelloOperator
-# from operators.stage_redshift import StageToRedshiftOperator
-# from operators.data_quality import DataQualityOperator
-# from helpers.sql_queries import SqlQueries
-# from helpers.sql_data_quality_queries import SqlDataQualityQueries
-
-
-# AWS_KEY = os.environ.get("AWS_KEY")
-# AWS_SECRET = os.environ.get("AWS_SECRET")
-
-# [ok] https://classroom.udacity.com/nanodegrees/nd027/parts/45d1c3b1-d87b-4578-a6d0-7e86bb5fea6c/modules/57c3b9d1-4d8b-4afe-bfb4-92cfac622c7f/lessons/4d1d5892-2cab-4456-8b1a-fb2b5fa1488d/concepts/3b78f18c-3a53-40ab-8300-b1fe5208de97
 
 default_args = {
     "owner": "paulo_moreira",

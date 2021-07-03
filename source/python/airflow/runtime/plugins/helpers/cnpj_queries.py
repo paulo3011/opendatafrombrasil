@@ -51,15 +51,15 @@ class CnpjSqlQueries:
 
     create_stage_tables = ("""
     SET search_path TO open_data;
-    CREATE TABLE stage_dim_city_code AS SELECT * FROM open_data.dim_city_code WHERE 1 = 0;
-    CREATE TABLE stage_dim_cnae AS SELECT * FROM open_data.dim_cnae WHERE 1 = 0;
-    CREATE TABLE stage_dim_company AS SELECT * FROM open_data.dim_company WHERE 1 = 0;
-    CREATE TABLE stage_dim_country_code AS SELECT * FROM open_data.dim_country_code WHERE 1 = 0;
-    CREATE TABLE stage_dim_legal_nature AS SELECT * FROM open_data.dim_legal_nature WHERE 1 = 0;
-    CREATE TABLE stage_dim_partner AS SELECT * FROM open_data.dim_partner WHERE 1 = 0;
-    CREATE TABLE stage_dim_partner_qualification AS SELECT * FROM open_data.dim_partner_qualification WHERE 1 = 0;
-    CREATE TABLE stage_dim_simple_national AS SELECT * FROM open_data.dim_simple_national WHERE 1 = 0;
-    CREATE TABLE stage_fact_establishment AS SELECT * FROM open_data.fact_establishment WHERE 1 = 0;    
+    CREATE TABLE stage_dim_city_code AS SELECT * FROM dim_city_code WHERE 1 = 0;
+    CREATE TABLE stage_dim_cnae AS SELECT * FROM dim_cnae WHERE 1 = 0;
+    CREATE TABLE stage_dim_company AS SELECT * FROM dim_company WHERE 1 = 0;
+    CREATE TABLE stage_dim_country_code AS SELECT * FROM dim_country_code WHERE 1 = 0;
+    CREATE TABLE stage_dim_legal_nature AS SELECT * FROM dim_legal_nature WHERE 1 = 0;
+    CREATE TABLE stage_dim_partner AS SELECT * FROM dim_partner WHERE 1 = 0;
+    CREATE TABLE stage_dim_partner_qualification AS SELECT * FROM dim_partner_qualification WHERE 1 = 0;
+    CREATE TABLE stage_dim_simple_national AS SELECT * FROM dim_simple_national WHERE 1 = 0;
+    CREATE TABLE stage_fact_establishment AS SELECT * FROM fact_establishment WHERE 1 = 0;    
     """)
 
     drop_create_stage_tables = drop_stage_tables + create_stage_tables
