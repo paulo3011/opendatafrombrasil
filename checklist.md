@@ -11,13 +11,13 @@
 
 The write up describes a logical approach to this project under the following scenarios:
 
-- [pending] The data was increased by 100x.
-- [pending] The pipelines would be run on a daily basis by 7 am every day.
-- [pending] The database needed to be accessed by 100+ people.
+- [ok] The data was increased by 100x.
+- [ok] The pipelines would be run on a daily basis by 7 am every day.
+- [ok] The database needed to be accessed by 100+ people.
 
 ### Defending Decisions
 
-[pending] The choice of tools, technologies, and data model are justified well.
+[ok] The choice of tools, technologies, and data model are justified well.
 
 ## Execution
 

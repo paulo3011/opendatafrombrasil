@@ -347,6 +347,17 @@ Apache Spark was used for several reasons:
 
 Seealso: https://spark.apache.org/
 
+
+#### Addressing Other Scenarios
+
+A logical approach to this project under the following scenarios:
+
+- If the data was increased by 100x (17 GB x 100).
+- If the pipelines would be run on a daily basis by 7 am every day.
+- If the database needed to be accessed by 100+ people.
+
+All the tools used in this project are ready to deal with the possible scenarios mentioned above because they are tools able to process data on a large scale and allow increasing or decrease resource consumption as needed.
+
 # Future improvements
 
 ## Adding new datasets
