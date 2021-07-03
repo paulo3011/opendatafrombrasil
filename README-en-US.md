@@ -252,7 +252,7 @@ return nf.parse(numberString).toString();
 1. Run Spark job to process CSV files and create ORC files
 
 * You need to download the csv files from: http://200.152.38.155/CNPJ/ 
-** Unzip the files to some folder
+* Unzip the files to some folder
 
 ```shell
 # Running on spark cluster or local mode
