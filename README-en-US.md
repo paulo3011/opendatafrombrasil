@@ -251,6 +251,9 @@ return nf.parse(numberString).toString();
 
 1. Run Spark job to process CSV files and create ORC files
 
+* You need to download the csv files from: http://200.152.38.155/CNPJ/ 
+** Unzip the files to some folder
+
 ```shell
 # Running on spark cluster or local mode
 spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format orc
