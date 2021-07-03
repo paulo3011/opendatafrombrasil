@@ -120,7 +120,6 @@ public class CnpjRaw implements IPipeline {
     @Override
     public void Start(SparkSession sparkSession, Parameters parameters)
             throws Exception {
-        //todo decide about sqllite output - https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html
 
         if(parameters.getOutputFileType() == FileType.cnpj_raw)
         {
@@ -129,19 +128,17 @@ public class CnpjRaw implements IPipeline {
             throw new Exception("Output format FileType.cnpj_raw not implemented yet!");
         }
 
-        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles\\");
-        parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfiles-PRD\\");
         //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-05\\");//
-        parameters.setOutputFileFormat(FileFormat.orc);
 
         //debugSchemas(sparkSession);
-
         //this.loadTest(sparkSession);
-
         //this.analyzeRawData(sparkSession, parameters);
 
-        runTransformation(sparkSession,parameters,true);
+        //parameters.setInputPath("E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\");
+        //parameters.setOutputFileFormat(FileFormat.orc);
+        runTransformation(sparkSession, parameters,true);
     }
 
     @SuppressWarnings("unused")

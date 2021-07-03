@@ -7,11 +7,16 @@
 spark-submit --class application.batch.App opendata_etl-1.0.jar
 # custom params
 spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=paulo,spark.driver.cores=1
+# default params 1
+spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format orc
+# default params 2
+spark-submit --class application.batch.App opendata_etl-1.0.jar --spark-conf spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format parquet
 ```
 ## On cmd
 
 ```shell script
 java -jar opendata_etl-1.0.jar
+java -jar opendata_etl-1.0.jar --spark-conf spark.master=local[*],spark.app.name=brasil-open-etl --input-path E:\\hdfs\\cnpj\\2021-04-14\\allfilesdev\\ --input-type cnpj_raw --input-format csv --output-type cnpj_lake --output-format parquet
 ```
 
 # Erros conhecidos
