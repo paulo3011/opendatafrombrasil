@@ -246,6 +246,63 @@ return nf.parse(numberString).toString();
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
 
+Distribution strategy:
+
+As we know the frequent access pattern was defined the following strategy.
+
+Node size: 1 x dc2.large (160 GB storage) com 2 vCPU (2 slice), 15 GiB RAM
+(https://docs.aws.amazon.com/pt_br/redshift/latest/mgmt/working-with-clusters.html)
+
+```sql
+select
+	(select count(0) from open_data.dim_company) as dim_company
+	,(select count(0) from open_data.fact_establishment) as fact_establishment
+	,(select count(0) from open_data.dim_simple_national) as dim_simple_national
+	,(select count(0) from open_data.dim_partner) as dim_partner
+	
+	,(select count(0) from open_data.dim_city_code) as dim_city_code
+	,(select count(0) from open_data.dim_cnae) as dim_cnae
+	,(select count(0) from open_data.dim_country_code) as dim_country_code
+	,(select count(0) from open_data.dim_legal_nature) as dim_legal_nature	
+	,(select count(0) from open_data.dim_partner_qualification) as dim_partner_qualification
+;
+
+/*
+Name                     |Value   |
+-------------------------|--------|
+dim_company              |5032255 |
+fact_establishment       |5304980 |
+dim_simple_national      |27600101|
+dim_partner              |2161072 |
+dim_city_code            |5571    |
+dim_cnae                 |1358    |
+dim_country_code         |255     |
+dim_legal_nature         |88      |
+dim_partner_qualification|68      |
+*/
+```
+- Was not used "Even" distribution because all tables can be joined and the high cost to do this operation
+- Was used "All" distribution for small tables to speed up joins (dim_city_code, dim_cnae, dim_country_code, dim_legal_nature, dim_partner_qualification)
+- Was used KEY distribution for larger tables to put similar values in the same slice and speed up queries
+- Was distributed dim_company, dim_simple_national, dim_partner and fact_establishment on the joining key (basiccnpj) to eliminates shuffling. This column is good because all information about one company is distributed beetwenn this tables and this informations is joined by this key.
+
+Sorting strategy:
+
+Was used sorting key to minimezes the query time.
+
+"Sorting enables efficient handling of range-restricted predicates. Amazon Redshift stores columnar data in 1 MB disk blocks. The min and max values for each block are stored as part of the metadata. If query uses a range-restricted predicate, the query processor can use the min and max values to rapidly skip over large numbers of blocks during table scans." (https://docs.aws.amazon.com/redshift/latest/dg/t_Sorting_data.html)
+
+Frequent queries:
+
+- establishment, dim_company and dim_simple_national by: city, cnae, country, legal nature, matrix, companysize etc;
+- dim_partner by: partnertype, partnerqualification, country, agerange;
+
+SORTKEY considerations:
+
+- Was sorted by DISTKEY to speed up the join with related tables (dim and facts)
+- Was sorted by the frequent query filters (city, cnae, country, legal nature, matrix, companysize and partner qualification, etc) to speed up query time
+- I choose COMPOUND SORTKEY because the data will be sorted in the same order that the sortkey columns and the table filter will be probably done by sortkey columns and the type INTERLEAVED isn't a good choose for columns like datetime and autoincrements id's
+
 
 
 # Application functional requirements:
