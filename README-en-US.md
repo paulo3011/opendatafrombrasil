@@ -246,11 +246,10 @@ return nf.parse(numberString).toString();
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
 
-Distribution strategy:
-
-As we know the frequent access pattern was defined the following strategy.
+__Distribution strategy__:
 
 Node size: 1 x dc2.large (160 GB storage) com 2 vCPU (2 slice), 15 GiB RAM
+
 (https://docs.aws.amazon.com/pt_br/redshift/latest/mgmt/working-with-clusters.html)
 
 ```sql
@@ -281,6 +280,9 @@ dim_legal_nature         |88      |
 dim_partner_qualification|68      |
 */
 ```
+
+As we know the frequent access pattern, we defined the following strategy:
+
 - Was not used "Even" distribution because all tables can be joined and the high cost to do this operation
 - Was used "All" distribution for small tables to speed up joins (dim_city_code, dim_cnae, dim_country_code, dim_legal_nature, dim_partner_qualification)
 - Was used KEY distribution for larger tables to put similar values in the same slice and speed up queries

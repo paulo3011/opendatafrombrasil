@@ -18,8 +18,6 @@ The write up describes a logical approach to this project under the following sc
 ### Defending Decisions
 
 [pending] The choice of tools, technologies, and data model are justified well.
-[] fix table fields and distributions keys
-
 
 ## Execution
 
