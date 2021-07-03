@@ -112,7 +112,8 @@ tests = [
     create_intersect_total_test("open_data.stage_dim_country_code","open_data.dim_country_code"),
     create_intersect_total_test("open_data.stage_dim_legal_nature","open_data.dim_legal_nature"),
     create_intersect_total_test("open_data.stage_dim_partner_qualification","open_data.dim_partner_qualification"),
-    # SqlDataQualityQueries.establisment_company_relation_check the cnpj database is not healthy
+    # the cnpj database is not healthy
+    SqlDataQualityQueries.establisment_company_relation_check
     ]
 
 run_quality_checks = DataQualityOperator(
