@@ -444,6 +444,130 @@ Seealso:
 
 - https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html
 - https://aws.amazon.com/premiumsupport/knowledge-center/redshift-cluster-storage-space/
+- https://aws.amazon.com/redshift/pricing/
+
+
+__S3 and Spark Job impact (Data increased by 100 x):__
+
+![airflow.jpg](./assets/images/cnpj/sizing.jpg)
+
+The actual data distribution of the major table (fact_establishment):
+
+```sql
+select 
+	e.state
+	,count(0) as total_by_state 
+	,(count(0)*100.0)/48085895.0 as percentage_of_total
+from open_data.fact_establishment e group by e.state
+order by count(0) desc;
+
+/*
+state|total_by_state|percentage_of_total|
+-----|--------------|-------------------|
+SP   |      13771427|      28.6392236226|
+MG   |       5277500|      10.9751518610|
+RJ   |       4141697|       8.6131224135|
+RS   |       3496187|       7.2707121287|
+PR   |       3221563|       6.6996007872|
+BA   |       2458328|       5.1123681902|
+SC   |       2140080|       4.4505358588|
+GO   |       1648965|       3.4292072550|
+PE   |       1471800|       3.0607728108|
+CE   |       1370095|       2.8492658813|
+ES   |        995624|       2.0705115294|
+PA   |        974539|       2.0266629122|
+MT   |        875544|       1.8207917311|
+DF   |        805872|       1.6759010100|
+MA   |        750845|       1.5614662054|
+MS   |        649279|       1.3502483420|
+PB   |        610967|       1.2705742505|
+RN   |        562458|       1.1696943563|
+AM   |        503559|       1.0472072943|
+AL   |        463822|       0.9645697558|
+PI   |        431652|       0.8976686406|
+RO   |        345790|       0.7191090027|
+TO   |        326762|       0.6795381473|
+SE   |        319961|       0.6653947067|
+EX   |        148921|       0.3096978854|
+AC   |        117169|       0.2436660480|
+AP   |        112170|       0.2332700680|
+RR   |         93318|       0.1940652243|
+BR   |             1|       0.0000020796|
+ */
+
+select 
+	e.maincnae
+	,count(0) as total_by_maincnae
+	,(count(0)*100.0)/48085895.0 as percentage_of_total
+from open_data.fact_establishment e group by e.maincnae 
+order by count(0) desc limit 10;
+
+/*
+maincnae|total_by_maincnae|percentage_of_total|
+--------|-----------------|-------------------|
+ 4781400|          2822601|       5.8699146600|
+ 9492800|          2798437|       5.8196629177|
+ 8888888|          1808469|       3.7609136733|
+ 5611203|          1590811|       3.3082695039|
+ 4712100|          1415944|       2.9446140079|
+ 9602501|          1276983|       2.6556290571|
+ 5611201|           855265|       1.7786192811|
+ 4399103|           779004|       1.6200259972|
+ 7319002|           692591|       1.4403204931|
+ 9430800|           607662|       1.2637011331|
+ */ 
+
+-- Brazilian National Classification of Economic Activities
+select * from open_data.dim_cnae limit 3;
+
+/*
+code  |description                                              |
+------|---------------------------------------------------------|
+111302|Cultivo de milho                                         | (corn cultivation)
+111399|Cultivo de outros cereais não especificados anteriormente| (Cultivation of other cereals)
+112102|Cultivo de juta                                          | (Jute cultivation)
+ */ 
+
+select count(0) from open_data.dim_cnae;
+-- 1358
+```
+
+To define which partitioning strategy to use was taking into account the following best practices:
+
+- If the cardinality of a column will be very high, do not use that column for partitioning. For example, if you partition by a column userId and if there can be 1M distinct user IDs, then that is a bad partitioning strategy.
+- Amount of data in each partition: You can partition by a column if you expect data in that partition to be at least 1 GB.
+
+(https://docs.databricks.com/delta/best-practices.html)
+
+Considering the increase in data size by 100x and the daily execution, partitioning could be done:
+
+- As the most frequent analysis in the database will be considering economic activity (one or a restricted group of activities) and taking into account the distribution of data, we can have the main economic activity code as the main partition.
+- It would be a maximum of 1358 partitions.
+- Partitioning by economic activity proved better than partitioning by geographic distribution because the geographic distribution would make the data unevenly distributed. São Paulo, for example, would have 28% of the data.
+- Partitioning by economic activity can be used to distribute data from dim_company, dim_partner, dim_simple_national and fact_establishment tables because the data fetching logic is the same.
+- Other tables do not need partitioning because they are small.
+
+
+__The pipelines would be run on a daily basis by 7 am every day__
+
+* The CNPJ data source there's no need to run on a daily basis (The CNPJ data source is released on a monthly basis), but we will suppose this scenario for the purpose of this project.
+
+Will be necessary to adjust the airflow job:
+
+- Will need to build a new task on the current dag (cnpj_dag.py) to automate the spark work that processes CNPJ CSV files and saves to s3
+- The new Spark task will call the EMR API to run work on a Spark cluster because the airflow is not meant to do this kind of processing
+- Configure the dag schedule (cnpj_dag.py) to run on daily basis at 7 am every day. (schedule_interval="0 7 * * *")
+- There will be an increase in cost due to the need for a daily EMR run. The cluster does not need to be running for 24 hours and will always be turned off after finishing the processing routine. (Will need to simulate the increase in data size and run the spark job to assess the total execution time in this scenario)
+- There is no need to increase the airflow infrastructure because all the heavy lifting is done in Spark Cluster or Redshift Cluster
+- We can do studies and tests to run airflow and Spark on the same cluster of kubernetes to assess cost savings
+- The impact of running the routine daily would be to provide updated information with a maximum daley of 1 day. This allows to generate more accurate analysis and insights
+
+Seealso:
+
+- https://airflow.apache.org/docs/apache-airflow/1.10.1/scheduler.html
+- https://en.wikipedia.org/wiki/Cron#CRON_expression
+- https://www.upsolver.com/blog/partitioning-data-s3-improve-performance-athena-presto
+
 
 __The database needed to be accessed by 100+ people:__
 
