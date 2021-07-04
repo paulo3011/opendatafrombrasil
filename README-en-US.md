@@ -418,9 +418,9 @@ open_data|dim_partner_qualification|      68|   5|ALL           |AUTO(SORTKEY)|
 
 If the data increased by 100 x the numbers of the data would be:
 
-CSV source files: 17 x 100 = 1700 GB (1,7 TB)
-Lake files (ORC format - output of spark processing): 5 GB x 100 = 500 GB (0,5 TB)
-Redshift storage consumption: 8 GB x 100 = 800 GB
+- CSV source files: 17 x 100 = 1700 GB (1,7 TB)
+- Lake files (ORC format - output of spark processing): 5 GB x 100 = 500 GB (0,5 TB)
+- Redshift storage consumption: 8 GB x 100 = 800 GB
 
 Redshift recomendation for this scenario:
 
