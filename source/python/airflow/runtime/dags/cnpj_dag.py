@@ -41,63 +41,63 @@ drop_stage_tables = RedshiftRunOperator(task_id="drop_stage_tables", sql=CnpjSql
 load_partner_table = RedshiftLoadOperator(
   task_id="load_dim_partner", 
   stage_table_name = "open_data.stage_dim_partner",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/partner/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/partner/part-", 
   target_table = "open_data.dim_partner",
   dag=dag)
 
 load_simple_national_table = RedshiftLoadOperator(
   task_id="load_dim_simple_national", 
   stage_table_name = "open_data.stage_dim_simple_national",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/simple_national/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/simple_national/part-", 
   target_table = "open_data.dim_simple_national",
   dag=dag)  
 
 load_company_table = RedshiftLoadOperator(
   task_id="load_dim_company", 
   stage_table_name = "open_data.stage_dim_company",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/company/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/company/part-", 
   target_table = "open_data.dim_company",
   dag=dag)   
 
 load_fact_establishment_table = RedshiftLoadOperator(
   task_id="load_fact_establishment", 
   stage_table_name = "open_data.stage_fact_establishment",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/establishment/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/establishment/part-", 
   target_table = "open_data.fact_establishment",
   dag=dag)   
 
 load_dim_city_code_table = RedshiftLoadOperator(
   task_id="load_dim_city_code", 
   stage_table_name = "open_data.stage_dim_city_code",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/city_code/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/city_code/part-", 
   target_table = "open_data.dim_city_code",
   dag=dag)   
 
 load_dim_cnae_table = RedshiftLoadOperator(
   task_id="load_dim_cnae", 
   stage_table_name = "open_data.stage_dim_cnae",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/cnae_code/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/cnae_code/part-", 
   target_table = "open_data.dim_cnae",
   dag=dag)   
 
 load_dim_country_code = RedshiftLoadOperator(
   task_id="load_dim_country_code", 
   stage_table_name = "open_data.stage_dim_country_code",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/country_code/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/country_code/part-", 
   target_table = "open_data.dim_country_code",
   dag=dag)    
 
 load_dim_legal_nature = RedshiftLoadOperator(
   task_id="load_dim_legal_nature", 
   stage_table_name = "open_data.stage_dim_legal_nature",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/legal_nature_code/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/legal_nature_code/part-", 
   target_table = "open_data.dim_legal_nature",
   dag=dag)    
 
 load_dim_partner_qualification = RedshiftLoadOperator(
   task_id="load_dim_partner_qualification", 
   stage_table_name = "open_data.stage_dim_partner_qualification",
-  source = "s3://moreira-ud/stage/cnpj/teste/2021-06-19/partner_qualification_code/part-", 
+  source = "s3://moreira-ud/lake/dw/cnpj/2021/04/partner_qualification_code/part-", 
   target_table = "open_data.dim_partner_qualification",
   dag=dag)     
 

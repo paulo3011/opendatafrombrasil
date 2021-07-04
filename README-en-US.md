@@ -295,10 +295,10 @@ select
 /*
 Name                     |Value   |
 -------------------------|--------|
-dim_company              |5032255 |
-fact_establishment       |5304980 |
+dim_company              |45485995|
+fact_establishment       |48085895|
 dim_simple_national      |27600101|
-dim_partner              |2161072 |
+dim_partner              |40666844|
 dim_city_code            |5571    |
 dim_cnae                 |1358    |
 dim_country_code         |255     |
@@ -334,13 +334,22 @@ __Redshift__
 
 Redshift was used to be the data warehouse for the following reasons:
 
+- Amazon Redshift is a fully managed (We don't need to do maintenance), petabyte-scale, cloud-based data warehouse service who manages the work needed to set up, operate, and scale a data warehouse. For example, provisioning the infrastructure capacity, automating ongoing administrative tasks such as backups, and patching, and monitoring nodes and drives to recover from failures. Redshift also has automatic tuning capabilities, and surfaces recommendations for managing your warehouse in Redshift Advisor
+- On-premises data warehouses require significant time and resource to administer, especially for large datasets. In addition, the financial costs associated with building, maintaining, and growing self-managed, on-premises data warehouses are very high
+- Amazon Redshift is optimized for high-performance analysis and reporting of very large datasets
+- Amazon Redshift integrates with various data loading, ETL, business intelligence reporting and analytics tools
 - Can easily support thousands of concurrent users and concurrent queries, with consistently fast query performance
 - Can load data in columnar formats and execute queries in a parallel and optimized way (Massively Parallel Processing - MPP)
 - Supports optimized file formats like ORC and PARQUET
 - Redshift lets you easily save the results of your queries back to your S3 data lake using open formats, like Apache Parquet
 - Allows scale up and scale down
 
-Seealso: https://aws.amazon.com/redshift/features/concurrency-scaling/?nc=sn&loc=2&dn=3
+
+Seealso: 
+
+- https://aws.amazon.com/redshift/features/concurrency-scaling/?nc=sn&loc=2&dn=3
+- https://docs.aws.amazon.com/redshift/latest/dg/c_high_level_system_architecture.html
+- https://aws.amazon.com/redshift/faqs/?nc1=h_ls
 
 __Airflow__
 
@@ -369,11 +378,77 @@ Seealso: https://spark.apache.org/
 
 A logical approach to this project under the following scenarios:
 
-- If the data was increased by 100x (17 GB x 100).
+- If the data was increased by 100x.
 - If the pipelines would be run on a daily basis by 7 am every day.
 - If the database needed to be accessed by 100+ people.
 
-All the tools used in this project are ready to deal with the possible scenarios mentioned above because they are tools able to process data on a large scale and allow increasing or decrease resource consumption as needed.
+All the tools used in this project are ready to deal with the possible scenarios mentioned above because they are tools able to process data on a large scale and allow us increasing or decrease resource consumption as needed.
+
+__Data increased by 100 x :__
+
+Current storage consumption by the Redshift:
+
+```sql
+-- https://docs.aws.amazon.com/pt_br/redshift/latest/dg/r_SVV_TABLE_INFO.html
+SELECT 
+	"schema", 
+	"table", 
+	tbl_rows,
+	"size", -- the size in blocks of 1 MB
+	diststyle, 
+	sortkey1 
+from SVV_TABLE_INFO;
+
+/*
+schema   |table                    |tbl_rows|size|diststyle     |sortkey1     |
+---------|-------------------------|--------|----|--------------|-------------|
+open_data|dim_partner              |40666844|1236|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_cnae                 |    1358|   5|ALL           |AUTO(SORTKEY)|
+open_data|fact_establishment       |48085895|4525|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_company              |45485995|1850|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_simple_national      |27600101| 456|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_country_code         |     255|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_city_code            |    5571|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_legal_nature         |      88|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_partner_qualification|      68|   5|ALL           |AUTO(SORTKEY)|
+*/
+
+-- total size: 1236 + 5 + 4525 + 1850 + 456 + (4 * 5) = 8092 MB (8 GB)
+```
+
+If the data increased by 100 x the numbers of the data would be:
+
+CSV source files: 17 x 100 = 1700 GB (1,7 TB)
+Lake files (ORC format - output of spark processing): 5 GB x 100 = 500 GB (0,5 TB)
+Redshift storage consumption: 8 GB x 100 = 800 GB
+
+Redshift recomendation for this scenario:
+
+- For datasets under 1 TB is to use DC2 nodes and choose the number of nodes based on data size and performance requirements
+- For 800 GB we can continue to use dc2.large and increase the node number to 10. We will have a total storage of 10x160 = 1600 GB (1,600TB) - Double the size is being considered due to redshift mirroring the data on another node's disks to reduce the risk of data loss
+- Increasing the number of nodes, we also increase the query performance because Amazon Redshift distributes and executes queries in parallel across all of a cluster’s compute nodes. 
+- The impact on cost at this size would be: 10 x $0.25 ($2,50) per hour. Considering 720 hours at the of the month we will have total cost of 720 x 2,50 ($1.800)
+- We can reserve nodes for steady-state production workloads, and receive significant discounts over on-demand nodes (at least 20 percent discount over on-demand rates.)
+- We can pause the cluster during unused time and leave it on only during working hours and reduce costs this way
+- If we consider 8 hours per day of work and at least 20 percent discount over on-demand rates we will have 240 x 2,50 ($600), subtracting the discounts the total cost at the end of month would be $480 (600-120).
+- We can also try to reduce to 7 the number of nodes to reduce cost (Testing before running in production of course)
+- We can also try to use Redshift Spectrum to query directly on s3 and reduce the number of nodes (test before running in production, of course)
+- Another possibility would be to assess the costs and response time for using AWS Athena as a way to query the data stored in s3
+- It will not be necessary to replicate the cluster because the objective would be for internal use and for analysis that can take a few hours to re-establish the cluster in case of any problem that makes the cluster unavailable. In addition to the form of use, another point that imposes a certain limit on replicating the cluster is the cost of the service.
+
+* DC2 nodes store data locally for high performance, and as the data size grows, we can add more compute nodes to increase the storage capacity of the cluster
+* AWS recommends DC2 node types for the best performance at the lowest price
+* When you run a cluster with at least two compute nodes, __data on each node is mirrored on disks of another node to reduce the risk of incurring data loss__.
+
+Seealso:
+
+- https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html
+- https://aws.amazon.com/premiumsupport/knowledge-center/redshift-cluster-storage-space/
+
+__The database needed to be accessed by 100+ people:__
+
+For this project in particular replication does not make sense because
+
 
 # Future improvements
 
