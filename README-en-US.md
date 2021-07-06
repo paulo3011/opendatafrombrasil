@@ -240,14 +240,7 @@ return nf.parse(numberString).toString();
 - Invalid dates were treated as null
 
 
-## 3. Define the data model
-
-### __Model__
-
-![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
-
-
-## 4. Run ETL to model the data
+## 3. Run ETL to model the data
 
 1. Run Spark job to process CSV files and create ORC files
 
@@ -268,9 +261,67 @@ After save spark output on s3, manualy run airflow dag to load the ORC files int
 
 ![airflow.jpg](./assets/images/cnpj/airflow_data_dag_2.jpg)
 
-## 5. Describe and document the Project
+## 4. Describe and document the Project
 
 ### Defending Decisions
+
+__Data Model__
+
+![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
+
+The main reason for organizing the data in this way was thinking about the end users of this database. The raw format files and layout of these files provided by the Brazilian government are organized in this way and reflecting this organization in the analytical database tables will simplify use by end users.
+
+Other reasons:
+
+- Each company can have N branches (establishments) and all dim_company data is repeated in these branches. As there are many company registries (approximately 1.9 GB), it was considered a good arrangement for this scenario. If we consider the 100x magnification scenario, it is even more consistent because it would be a duplication of approximately 185 GB of data for the company table. 
+- The same logic applies to dim_simple_national, although it is a smaller table.
+- Leaving the records of companies with special regimes (simple national and mei) separated in the dim_simple_national table allows accounting of the totals of these companies without having to use the larger table fact_establishment
+- For cases in which an analysis is needed considering a join between the fact_establishment, dim_company and dim_simple_national tables, a data distribution by the join key of these tables was adopted to speed up the joins of the data in these tables
+- The downside of this approach is that it needs extra join if you need to filter by type of legal nature, companysize or simple national
+
+Results for the questions mentioned in scope:
+
+- how big is my market?
+
+* Let's assume that your potential customers are a dental services company
+* CNAE: 3250706 - Dental services
+
+```sql
+select count(0) as total from fact_establishment where mainCnae = 3250706;
+```
+
+- Who are my customers, what companies do they own, is there any contact information available?
+
+```sql
+select p.* from dim_partner p
+join fact_establishment e on e.basicCnpj=p.basicCnpj
+where e.mainCnae = 3250706;
+```
+
+- In which city is a good place to start a business?
+
+```sql
+select 
+	e.state
+	,count(0) as total_by_state 
+from fact_establishment e group by e.state
+where mainCnae = 3250706
+order by count(0) desc;
+
+
+select 
+	e.state
+	,c.description as city
+	,count(0) as total_by_state 
+from fact_establishment e 
+join dim_city_code c on c.code=e.cityCode
+group by 
+	e.state
+	c.description
+where mainCnae = 3250706
+order by count(0) desc;
+```
+
 
 __Distribution strategy__:
 
@@ -279,32 +330,31 @@ Node size: 1 x dc2.large (160 GB storage) com 2 vCPU (2 slice), 15 GiB RAM
 (https://docs.aws.amazon.com/pt_br/redshift/latest/mgmt/working-with-clusters.html)
 
 ```sql
-select
-	(select count(0) from open_data.dim_company) as dim_company
-	,(select count(0) from open_data.fact_establishment) as fact_establishment
-	,(select count(0) from open_data.dim_simple_national) as dim_simple_national
-	,(select count(0) from open_data.dim_partner) as dim_partner
-	
-	,(select count(0) from open_data.dim_city_code) as dim_city_code
-	,(select count(0) from open_data.dim_cnae) as dim_cnae
-	,(select count(0) from open_data.dim_country_code) as dim_country_code
-	,(select count(0) from open_data.dim_legal_nature) as dim_legal_nature	
-	,(select count(0) from open_data.dim_partner_qualification) as dim_partner_qualification
-;
+-- https://docs.aws.amazon.com/pt_br/redshift/latest/dg/r_SVV_TABLE_INFO.html
+SELECT 
+	"schema", 
+	"table", 
+	tbl_rows,
+	"size", -- the size in blocks of 1 MB
+	diststyle, 
+	sortkey1 
+from SVV_TABLE_INFO;
 
 /*
-Name                     |Value   |
--------------------------|--------|
-dim_company              |45485995|
-fact_establishment       |48085895|
-dim_simple_national      |27600101|
-dim_partner              |40666844|
-dim_city_code            |5571    |
-dim_cnae                 |1358    |
-dim_country_code         |255     |
-dim_legal_nature         |88      |
-dim_partner_qualification|68      |
+schema   |table                    |tbl_rows|size|diststyle     |sortkey1     |
+---------|-------------------------|--------|----|--------------|-------------|
+open_data|dim_partner              |40666844|1236|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_cnae                 |    1358|   5|ALL           |AUTO(SORTKEY)|
+open_data|fact_establishment       |48085895|4525|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_company              |45485995|1850|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_simple_national      |27600101| 456|KEY(basiccnpj)|basiccnpj    |
+open_data|dim_country_code         |     255|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_city_code            |    5571|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_legal_nature         |      88|   5|ALL           |AUTO(SORTKEY)|
+open_data|dim_partner_qualification|      68|   5|ALL           |AUTO(SORTKEY)|
 */
+
+-- total size: 1236 + 5 + 4525 + 1850 + 456 + (4 * 5) = 8092 MB (8 GB)
 ```
 
 As we know the frequent access pattern, we defined the following strategy:
