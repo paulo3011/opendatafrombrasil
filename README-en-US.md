@@ -117,11 +117,6 @@ __Data from the National Simple__
 
 </br>
 
-
-__Reason for Registration Status__
-
-https://receita.economia.gov.br/orientacao/tributaria/cadastros/cadastro-nacional-de-pessoas-juridicas-cnpj/DominiosMotivoSituaoCadastral.csv/view
-
 __Comments__
 
 1. The field (CNPJ/CPF OF THE PARTNER) and (CNPJ/CPF OF THE REPRESENTATIVE) of the layout of partners must be uncharacterized according to the rule below:
