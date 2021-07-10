@@ -1,6 +1,6 @@
 # Open data from Brasil
 
-Leia em outro idioma (Read this in other language):
+Read this in other language (Leia em outro idioma):
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README-en-US.md)
 [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](README.md)
@@ -117,49 +117,6 @@ __Data from the Simple National__
 
 </br>
 
-__Comments__
-
-1. The field (CNPJ/CPF OF THE PARTNER) and (CNPJ/CPF OF THE REPRESENTATIVE) of the layout of partners must be uncharacterized according to the rule below:
-
-- Concealment of confidential personal information as in the case of the CPF, which must be uncharacterized by hiding the first three digits and the two verification digits, as provided for in art. 129 § 2 of Law No. 13.473/2017 (LDO
-2018).
-
-2. Responsible Federative Entity Field - EFR, in the Main Layout (Registration Data):
-
-It must be completed for the cases of Bodies and Entities of the 1XX Legal Nature group. For other natures, this attribute is blank.
-
-Examples of text that should appear in the final file:
-
-- UNION;
-- FEDERAL DISTRICT;
-- BAHIA;
-
-for municipalities, also display the acronym of the UF:
-
-- SAO PAULO-SP;
-- BELO HORIZONTE – MG;
-
-3. Age Range field, in the Members Layout
-
-Based on the date of birth of the CPF of each partner, the value for the Age group field must be created according to the rule below:
-
-- 1 for the intervals between 0 and 12 years;
-- 2 for the intervals between 13 and 20 years;
-- 3 for the intervals between 21 and 30 years;
-- 4 for the intervals between 31 and 40 years;
-- 5 for the intervals between 41 and 50 years;
-- 6 for the intervals between 51 and 60 years;
-- 7 for the intervals between 61 and 70 years;
-- 8 for the intervals between 71 and 80 years;
-- 9 for people over 80 years old;
-- 0 for not applicable;
-
-4. The CNAE FISCAL SECONDARY Field, in the Establishments Layout:
-
-It must be filled in with each occurrence being separated by a comma, for cases of multiple occurrences.
-
-</br>
-
 ### __Known Data Issues and How to Address__
 <br/>
 
@@ -234,8 +191,15 @@ return nf.parse(numberString).toString();
 
 - Invalid dates were treated as null
 
+## 3. Define the data model
 
-## 3. Run ETL to model the data
+![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
+
+[create_database.sql](./source/python/airflow/runtime/sql/create_database.sql)
+
+[Data Dictionary](./assets/docs/database/dictionary-en-US.md)
+
+## 4. Run ETL to model the data
 
 1. Run Spark job to process CSV files and create ORC files
 
@@ -256,15 +220,13 @@ After save spark output on s3, manualy run airflow dag to load the ORC files int
 
 ![airflow.jpg](./assets/images/cnpj/airflow_data_dag_2.jpg)
 
-## 4. Describe and document the Project
+## 5. Describe and document the Project
 
 ### Defending Decisions
 
 __Data Model__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
-
-[create_database.sql](./source/python/airflow/runtime/sql/create_database.sql)
 
 The main reason for organizing the data in this way was thinking about the end users of this database. The raw format files and layout of these files provided by the Brazilian government are organized in this way and reflecting this organization in the analytical database tables will simplify use by end users.
 

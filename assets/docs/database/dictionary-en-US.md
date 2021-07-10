@@ -126,3 +126,44 @@
 | DATE OF EXCLUSION FROM THE MEI | DATE OF EXCLUSION FROM THE MEI                                                       | DATE       |
 
 </br>
+
+# __Comments__
+
+1. The field (CNPJ/CPF OF THE PARTNER) and (CNPJ/CPF OF THE REPRESENTATIVE) of the layout of partners must be uncharacterized according to the rule below:
+
+- Concealment of confidential personal information as in the case of the CPF, which must be uncharacterized by hiding the first three digits and the two verification digits, as provided for in art. 129 § 2 of Law No. 13.473/2017 (LDO
+2018).
+
+2. Responsible Federative Entity Field - EFR, in the Main Layout (Registration Data):
+
+It must be completed for the cases of Bodies and Entities of the 1XX Legal Nature group. For other natures, this attribute is blank.
+
+Examples of text that should appear in the final file:
+
+- UNION;
+- FEDERAL DISTRICT;
+- BAHIA;
+
+for municipalities, also display the acronym of the UF:
+
+- SAO PAULO-SP;
+- BELO HORIZONTE – MG;
+
+3. Age Range field, in the Members Layout
+
+Based on the date of birth of the CPF of each partner, the value for the Age group field must be created according to the rule below:
+
+- 1 for the intervals between 0 and 12 years;
+- 2 for the intervals between 13 and 20 years;
+- 3 for the intervals between 21 and 30 years;
+- 4 for the intervals between 31 and 40 years;
+- 5 for the intervals between 41 and 50 years;
+- 6 for the intervals between 51 and 60 years;
+- 7 for the intervals between 61 and 70 years;
+- 8 for the intervals between 71 and 80 years;
+- 9 for people over 80 years old;
+- 0 for not applicable;
+
+4. The CNAE FISCAL SECONDARY Field, in the Establishments Layout:
+
+It must be filled in with each occurrence being separated by a comma, for cases of multiple occurrences.
