@@ -282,43 +282,120 @@ Results for the questions mentioned in scope:
 
 - how big is my market?
 
-* Let's assume that your potential customers are a dental services company
-* CNAE: 3250706 - Dental services
+* Let's assume that your potential customers are services company
+* Those provide services related to: Installation, maintenance, repair or rental of machines
 
 ```sql
-select count(0) as total from fact_establishment where mainCnae = 3250706;
+-- Possible customers:
+create temporary table possible_clients
+as
+select * from dim_cnae dc 
+where dc.code not in (1821100,1822901,2539001,5912001,9603303,9603305)
+and(
+dc.description like '%Instalação%' or dc.description like '%manutenção%'
+or dc.description like '%Serviços de%' or dc.description like '%Reparação%'
+or dc.description like '%Aluguel de máquinas%' or dc.description like '%Aluguel de outras máquinas%'
+);
+
+-- 2 - ACTIVE (only clients active)
+select count(0) as total from fact_establishment e 
+where e.mainCnae in (select code from possible_clients) and e.registrationstatus=2;
+-- 1968732
+
+-- total by state
+select e.state, count(0) as total from fact_establishment e 
+where e.mainCnae in (select code from possible_clients) and e.registrationstatus=2
+group by e.state;
+
+/*
+state|total |
+-----|------|
+SP   |613669|
+MG   |227137|
+RJ   |179489|
+PR   |142464|
+RS   |136611|
+SC   | 98002|
+BA   | 87542|
+GO   | 64873|
+PE   | 51019|
+CE   | 41683|
+ES   | 40517|
+MT   | 35882|
+DF   | 35304|
+PA   | 30723|
+MS   | 28049|
+RN   | 24213|
+PB   | 22624|
+MA   | 17791|
+AL   | 16544|
+AM   | 16116|
+SE   | 13443|
+TO   | 12362|
+PI   | 11762|
+RO   | 11397|
+AP   |  2694|
+RR   |  2668|
+AC   |  2601|
+EX   |  1553|
+*/
 ```
 
 - Who are my customers, what companies do they own, is there any contact information available?
 
 ```sql
-select p.* from dim_partner p
-join fact_establishment e on e.basicCnpj=p.basicCnpj
-where e.mainCnae = 3250706;
+select 
+	e.fantasyname, 
+	e.basiccnpj,
+	dp.partnername,
+	dp.partnerstartdate,
+	dp.agerange,
+	e.taxpayeremail,	
+	e.telephone1areacode,
+	e.telephone1
+from fact_establishment e 
+join dim_partner dp on dp.basiccnpj = e.basiccnpj 
+where 
+	e.mainCnae in (select code from possible_clients) 
+	and e.registrationstatus=2 
+	and len(e.fantasyname)> 1
+limit 5;
+
+/*
+fantasyname                         |basiccnpj|partnername                       |partnerstartdate|agerange|taxpayeremail        |telephone1areacode|telephone1|
+------------------------------------|---------|----------------------------------|----------------|--------|---------------------|------------------|----------|
+INSTITUTO ESTER GOMES - UNIDADE SEDE|00000138 |REGILENE GOMES RODRIGUES          |      2013-07-18|       7|sample@email.com	 |11                |99999999  |
+INSTITUTO ESTER GOMES - UNIDADE SEDE|00000138 |REGILENE GOMES RODRIGUES          |      2013-07-18|       7|sample@email.com	 |11                |99999999  |
+D A LOGISTICA S/A                   |00001164 |LEONARDO GUILHERME LOURENCO MOISES|      2013-05-20|       5|sample@email.com	 |81                |99999999  |
+D A LOGISTICA S/A                   |00001164 |LEONARDO GUILHERME LOURENCO MOISES|      2013-05-20|       5|sample@email.com	 |81                |99999999  |
+D A LOGISTICA S/A                   |00001164 |GUILHERME AUGUSTO MACHADO         |      2018-01-22|       7|sample@email.com	 |81                |99999999  |
+*/
 ```
 
 - In which city is a good place to start a business?
 
 ```sql
-select 
-	e.state
-	,count(0) as total_by_state 
-from fact_establishment e group by e.state
-where mainCnae = 3250706
-order by count(0) desc;
-
-
-select 
-	e.state
-	,c.description as city
-	,count(0) as total_by_state 
+-- total by state an city
+select e.state, c.description as city, count(0) as total 
 from fact_establishment e 
 join dim_city_code c on c.code=e.cityCode
-group by 
-	e.state
-	c.description
-where mainCnae = 3250706
-order by count(0) desc;
+where e.mainCnae in (select code from possible_clients) and e.registrationstatus=2
+group by e.state, c.description order by count(0) desc limit 10;
+
+/*
+state|city          |total |
+-----|--------------|------|
+SP   |SAO PAULO     |206613|
+RJ   |RIO DE JANEIRO| 86442|
+MG   |BELO HORIZONTE| 54512|
+PR   |CURITIBA      | 35675|
+DF   |BRASILIA      | 35304|
+BA   |SALVADOR      | 28054|
+RS   |PORTO ALEGRE  | 23443|
+CE   |FORTALEZA     | 23303|
+GO   |GOIANIA       | 21265|
+SP   |CAMPINAS      | 18149|
+*/
 ```
 
 
