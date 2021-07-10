@@ -53,28 +53,28 @@ Files and examples:
 __Establishments__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/csv_estabelecimentos.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#estabelecimentos)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Establishments)
 
 </br>
 
 __Companies__
 
 ![csv_empresas.jpg](./assets/images/cnpj/csv_empresas.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#empresas)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Companies)
 
 </br>
 
 __Partners__
 
 ![csv_socios.jpg](./assets/images/cnpj/csv_socios.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#sócios)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Partners)
 
 </br>
 
 __CNAE - National Classification of Economic Activities__
 
 ![csv_cnaes.jpg](./assets/images/cnpj/csv_cnaes.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#cnae---classificação-nacional-de-atividades-econômicas)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#National-Classification-of-Economic-Activities)
 
 _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
 
@@ -83,7 +83,7 @@ _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.b
 __Legal Nature__
 
 ![csv_naturezajuridica.jpg](./assets/images/cnpj/csv_naturezajuridica.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#natureza-jurídica)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Legal-Nature)
 
 _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.br)
 
@@ -92,28 +92,28 @@ _Agency responsible for this classification:_ [concla](https://concla.ibge.gov.b
 __Member Qualification__
 
 ![csv_qualificacao.jpg](./assets/images/cnpj/csv_qualificacao.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#qualificação-do-sócio)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Partner-Qualification)
 
 </br>
 
 __City Code__
 
 ![csv_municipio.jpg](./assets/images/cnpj/csv_municipio.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#código-do-município)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#City-Code)
 
 </br>
 
 __Country code__
 
 ![csv_pais.jpg](./assets/images/cnpj/csv_pais.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#código-do-país)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Country-Code)
 
 </br>
 
-__Data from the National Simple__
+__Data from the Simple National__
 
 ![csv_simples.jpg](./assets/images/cnpj/csv_simples.jpg)
-[Field Dictionary](./assets/docs/database/dictionary-en-US.md#dados-do-simples-nacional)
+[Field Dictionary](./assets/docs/database/dictionary-en-US.md#Simple-National)
 
 </br>
 
@@ -269,6 +269,8 @@ __Data Model__
 The main reason for organizing the data in this way was thinking about the end users of this database. The raw format files and layout of these files provided by the Brazilian government are organized in this way and reflecting this organization in the analytical database tables will simplify use by end users.
 
 Other reasons:
+
+![airflow.jpg](./assets/images/cnpj/sizing.jpg)
 
 - Each company can have N branches (establishments) and all dim_company data is repeated in these branches. As there are many company registries (approximately 1.9 GB), it was considered a good arrangement for this scenario. If we consider the 100x magnification scenario, it is even more consistent because it would be a duplication of approximately 185 GB of data for the company table. 
 - The same logic applies to dim_simple_national, although it is a smaller table.
