@@ -126,7 +126,7 @@ __Field:__ Date registration status
 
 __Value:__ 0
 
-__Problema:__ Invalid format
+__Problem:__ Invalid format
 
 ```txt
 "30005475";"0001";"31";"1";"";"2";"0";"0";"";"";"20180322";"6204000";"6209100,7490104";"AVENIDA";"PAULISTA";"2202";"CONJ  54-B";"BELA VISTA";"01310300";"SP";"7107";"11";"59085410";"";"";"";"";"CEFISCO@UOL.COM.BR";"";""
@@ -138,7 +138,7 @@ __Field:__ Date registration status
 
 __Value:__ 4100813
 
-__Problema:__ Invalid format
+__Problem:__ Invalid format
 
 ```txt
 "18825426";"0001";"40";"1";"ALAMBIQUE SANTO ANTONIO";"8";"20150209";"73";"";"";"4100813";"5611204";"";"RUA";"DEOLINDO PERIM";"79";"";"ITAPUA";"29101811";"ES";"5703";"27";"98921990";"27";"";"";"";"JFJUNCAL@GMAIL.COM";"";""
@@ -150,7 +150,7 @@ __Field:__ Date registration status
 
 __Value:__ 4100813
 
-__Problema:__ Complement "EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805" it has a semicolon which is the file separator and depending on the csv parser being used it gets lost and messes up the columns.
+__Problem:__ Complement "EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805" it has a semicolon which is the file separator and depending on the csv parser being used it gets lost and messes up the columns.
 
 ```txt
 "36452531";"0001";"62";"1";"AMPPLA CREATIVE STUDIO";"2";"20200221";"0";"";"";"20200221";"1821100";"5819100,5811500,5812302,1813001,5912099,5812301,7319002,5813100";"ESTRADA";"DO MANDU";"560";"EDIF HORTO SAO RAFAEL;BLOCO 2;ANDAR 805";"SAO MARCOS";"41250400";"BA";"3849";"71";"99479533";"";"";"";"";"JONATASMA@GMAIL.COM";"";""
@@ -178,7 +178,7 @@ public static String fixStringValues(String value) {
 - To convert monetary values ​​it was necessary to use local format from Brazil
 
 ```Java
-//exemplo
+//sample
 public static String fixStringValues(String value) {
     if (value == null || value.equals("null"))
         return null;
@@ -515,7 +515,7 @@ Redshift recomendation for this scenario:
 - For datasets under 1 TB is to use DC2 nodes and choose the number of nodes based on data size and performance requirements
 - For 800 GB we can continue to use dc2.large and increase the node number to 10. We will have a total storage of 10x160 = 1600 GB (1,600TB) - Double the size is being considered due to redshift mirroring the data on another node's disks to reduce the risk of data loss
 - Increasing the number of nodes, we also increase the query performance because Amazon Redshift distributes and executes queries in parallel across all of a cluster’s compute nodes. 
-- The impact on cost at this size would be: 10 x $0.25 ($2,50) per hour. Considering 720 hours at the of the month we will have total cost of 720 x 2,50 ($1.800)
+- The impact on cost at this size would be: 10 x $0.25 ($2,50) per hour. Considering 720 hours at the end of the month we will have total cost of 720 x 2,50 ($1.800)
 - We can reserve nodes for steady-state production workloads, and receive significant discounts over on-demand nodes (at least 20 percent discount over on-demand rates.)
 - We can pause the cluster during unused time and leave it on only during working hours and reduce costs this way
 - If we consider 8 hours per day of work and at least 20 percent discount over on-demand rates we will have 240 x 2,50 ($600), subtracting the discounts the total cost at the end of month would be $480 (600-120).
