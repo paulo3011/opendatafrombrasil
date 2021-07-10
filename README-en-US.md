@@ -697,8 +697,21 @@ Seealso:
 
 __The database needed to be accessed by 100+ people:__
 
-For this project in particular replication does not make sense because
+- For this project in particular replication does not make sense because
 
+If necessary, we can:
+
+- Activate Concurrency Scaling feature who can support virtually unlimited concurrent users and concurrent queries, with consistently fast query performance
+- Resize the Amazon Redshift clusters by adding more nodes or changing node types with no downtime
+- Use Elastic Resize who adds or removes nodes automatically
+- Spin up multiple Amazon Redshift clusters by restoring data from a snapshot
+- Create different query queues and prioritize according to usage. It is possible to use automatic WLM or manual.
+
+Seealso:
+
+- https://docs.aws.amazon.com/redshift/latest/dg/concurrency-scaling.html
+- https://aws.amazon.com/blogs/big-data/scale-your-amazon-redshift-clusters-up-and-down-in-minutes-to-get-the-performance-you-need-when-you-need-it/
+- https://aws.amazon.com/premiumsupport/knowledge-center/redshift-wlm-etl-queues/
 
 # Future improvements
 
