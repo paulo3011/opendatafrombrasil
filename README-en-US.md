@@ -269,6 +269,8 @@ __Data Model__
 
 ![csv_estabelecimentos.jpg](./assets/images/cnpj/opendata.png)
 
+[create_database.sql](./source/python/airflow/runtime/sql/create_database.sql)
+
 The main reason for organizing the data in this way was thinking about the end users of this database. The raw format files and layout of these files provided by the Brazilian government are organized in this way and reflecting this organization in the analytical database tables will simplify use by end users.
 
 Other reasons:
