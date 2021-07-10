@@ -280,7 +280,7 @@ Other reasons:
 
 Results for the questions mentioned in scope:
 
-- how big is my market?
+1 - how big is my market?
 
 * Let's assume that your potential customers are services company
 * Those provide services related to: Installation, maintenance, repair or rental of machines
@@ -341,7 +341,7 @@ EX   |  1553|
 */
 ```
 
-- Who are my customers, what companies do they own, is there any contact information available?
+2 - Who are my customers, what companies do they own, is there any contact information available?
 
 ```sql
 select 
@@ -372,7 +372,7 @@ D A LOGISTICA S/A                   |00001164 |GUILHERME AUGUSTO MACHADO        
 */
 ```
 
-- In which city is a good place to start a business?
+3 - In which city is a good place to start a business?
 
 ```sql
 -- total by state an city
