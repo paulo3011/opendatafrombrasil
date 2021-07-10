@@ -278,7 +278,7 @@ Other reasons:
 - For cases in which an analysis is needed considering a join between the fact_establishment, dim_company and dim_simple_national tables, a data distribution by the join key of these tables was adopted to speed up the joins of the data in these tables
 - The downside of this approach is that it needs extra join if you need to filter by type of legal nature, companysize or simple national
 
-Results for the questions mentioned in scope:
+__Results for the questions mentioned in scope:__
 
 1 - how big is my market?
 
