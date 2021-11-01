@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "~/venvs/open_data"
+		"python.pythonPath": "~/venvs/open_data",
+		"python.envFile": "${workspaceFolder}/.env"
 	}
 }

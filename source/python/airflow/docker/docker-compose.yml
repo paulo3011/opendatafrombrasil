@@ -42,6 +42,7 @@ services:
             - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
             - _AIRFLOW_DB_UPGRADE=true
             - _AIRFLOW_WWW_USER_CREATE=true
+            # Create a default user for airflow ui with pass and login: airflow
             - _AIRFLOW_WWW_USER_USERNAME=${_AIRFLOW_WWW_USER_USERNAME:-airflow}
             - _AIRFLOW_WWW_USER_PASSWORD=${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
         ports:

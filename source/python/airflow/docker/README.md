@@ -86,7 +86,7 @@ To start airflow do:
 ```shell
 $ # enter to your project path
 $ cd ~/projects/opendatafrombrasil/source/python/airflow/docker
-$ docker-compose -up
+$ docker-compose up -d
 ```
 
 To start airflow scheduler do:
