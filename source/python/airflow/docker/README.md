@@ -32,10 +32,12 @@ $ git status
 
 5. Build your build command with your customizations like:
 
+seealso: https://airflow.apache.org/docs/docker-stack/build-arg-ref.html
+
 ```shell
 docker build . \
   --build-arg PYTHON_BASE_IMAGE="python:3.8-slim-buster" \
-  --build-arg AIRFLOW_PIP_VERSION=21.1.3 \
+  --build-arg AIRFLOW_PIP_VERSION=21.3.1 \
   --build-arg PYTHON_MAJOR_MINOR_VERSION=3.8 \
   --build-arg AIRFLOW_INSTALLATION_METHOD="apache-airflow" \
   --build-arg AIRFLOW_VERSION="2.0.1" \
@@ -43,7 +45,10 @@ docker build . \
   --build-arg AIRFLOW_SOURCES_FROM="empty" \
   --build-arg AIRFLOW_SOURCES_TO="/empty" \
   --build-arg INSTALL_MYSQL_CLIENT="false" \
-  --build-arg AIRFLOW_EXTRAS="amazon,http,postgres,sqlite" \
+  --build-arg AIRFLOW_EXTRAS="amazon,http,postgres,sqlite,microsoft.mssql,odbc" \
+  --build-arg ADDITIONAL_PYTHON_DEPS=" \
+        petl \
+        fastavro " \
   --tag moreira-opendata-airlfow-v2
 ```
 
