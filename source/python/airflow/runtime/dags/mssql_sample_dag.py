@@ -4,8 +4,7 @@ from airflow.operators.dummy import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.mssql_operator import MsSqlOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
-# from operators.petl_plugin import PetlOperator
-from airflow.models.connection import Connection
+
 
 default_args = {
     "owner": "paulo_moreira",
@@ -58,20 +57,5 @@ run_etl_with_pandas = PythonOperator(
     python_callable=mssql_etl_func,
     dag=dag
 )
-
-"""
-run_etl_with_petl = PetlOperator(
-    task_id="run_etl_with_petl",
-    source_conn="mssql_conn",
-    source="select 1 as id",
-    #dest_conn="s3_default",
-    dest_conn=Connection(host='/tmp/', conn_type='fs'),
-    destination="output.avro",
-    dag=dag,
-    debug=True
-)
-"""
-
-# start_operator >> conn_test >> [run_etl_with_pandas, run_etl_with_petl]
 
 start_operator >> conn_test >> run_etl_with_pandas
