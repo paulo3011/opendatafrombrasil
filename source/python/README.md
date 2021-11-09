@@ -31,7 +31,8 @@ Install the package:
 ```shell
 pip install pyspark==3.1.1
 pip install petl=1.7.4
-pip install sqlalchemy
+pip install sqlalchemy=1.4.26
+pip install cryptography=35.0.0
 ```
 
 Check installation:

@@ -45,6 +45,11 @@ services:
             # Create a default user for airflow ui with pass and login: airflow
             - _AIRFLOW_WWW_USER_USERNAME=${_AIRFLOW_WWW_USER_USERNAME:-airflow}
             - _AIRFLOW_WWW_USER_PASSWORD=${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+            # will be necessary to run docker-compose down if you use this setting after one docker-compose up run
+            - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=false            
+            # to generate the key, install locally with pip: https://pypi.org/project/cryptography/
+            # seealso: https://stackoverflow.com/questions/53897333/read-fernet-key-causes-valueerror-fernet-key-must-be-32-url-safe-base64-encoded
+            - AIRFLOW__CORE__FERNET_KEY=G_F-iZ8J4zLE0nJ58DVplD0sma6m44ioTL8wWc3BU_k=
         ports:
             - "8081:8080"
         networks:

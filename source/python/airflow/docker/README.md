@@ -91,7 +91,10 @@ To start airflow do:
 ```shell
 $ # enter to your project path
 $ cd ~/projects/opendatafrombrasil/source/python/airflow/docker
+$ # to run in background
 $ docker-compose up -d
+$ # or to run in current console and see logs on the screen (Useful when the container don't start)
+$ docker-compose up
 ```
 
 To start airflow scheduler do:
