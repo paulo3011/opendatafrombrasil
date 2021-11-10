@@ -50,6 +50,19 @@ services:
             # to generate the key, install locally with pip: https://pypi.org/project/cryptography/
             # seealso: https://stackoverflow.com/questions/53897333/read-fernet-key-causes-valueerror-fernet-key-must-be-32-url-safe-base64-encoded
             - AIRFLOW__CORE__FERNET_KEY=G_F-iZ8J4zLE0nJ58DVplD0sma6m44ioTL8wWc3BU_k=
+            # to give airflow credential do access aws (TAKE CARE: DON'T COMMIT YOUR CREDENTIALS):
+            #- AWS_DEFAULT_REGION=us-east-1
+            #- AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
+            #- AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
+            #- AWS_SESSION_TOKEN=YOUR_TEMP_TOKEN_HERE
+            # same personal database connection
+            # The environment variable naming convention is AIRFLOW_CONN_{CONN_ID}, all uppercase.
+            # seealso: https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html
+            # to get the uri, you can use airflow cli, after manually create de connection: airflow connections get -o json mssql_conn
+            # https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#generating-connection-uri
+            # ATTENTION: Connections set using Environment Variables would not appear in the Airflow UI but you will be able to use them in your DAG file.
+            - AIRFLOW_CONN_MSSQL_CONN=mssql://your_user:your_pass@your_host:1433/databasename
+            - AIRFLOW_CONN_S3_DEV=s3://your-bucket-name        
         ports:
             - "8081:8080"
         networks:

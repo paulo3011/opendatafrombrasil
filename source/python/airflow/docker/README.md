@@ -33,6 +33,7 @@ $ git status
 5. Build your build command with your customizations like:
 
 seealso: https://airflow.apache.org/docs/docker-stack/build-arg-ref.html
+seealso: https://airflow.apache.org/docs/apache-airflow/2.0.1/production-deployment.html
 
 ```shell
 docker build . \

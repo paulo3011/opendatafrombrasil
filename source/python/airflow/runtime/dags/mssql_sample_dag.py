@@ -4,7 +4,9 @@ from airflow.operators.dummy import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.mssql_operator import MsSqlOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
-
+from helpers.airflow_utils import check_s3_access_key, upload_file_to_s3
+# from operators.petl_plugin import PetlOperator
+from airflow.models.connection import Connection
 
 default_args = {
     "owner": "paulo_moreira",
@@ -47,10 +49,13 @@ def mssql_etl_func(**kwargs):
     file.close()
     print("File lines: ", all_lines)
 
+    upload_file_to_s3(file_path=destination, bucket="your-bucket-name", destination_key="tmp/my_records.csv")
+
     # or save on s3:
     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html?highlight=to_csv
     # https://stackoverflow.com/questions/38154040/save-dataframe-to-csv-directly-to-s3-python
-    # df.to_csv("s3://buckect/key/my_records.csv")
+    # df.to_csv("s3://your-bucket/tmp/my_records.csv")
+    # print("The file was saved to s3")
 
 run_etl_with_pandas = PythonOperator(
     task_id='run_etl_with_pandas',
@@ -58,4 +63,32 @@ run_etl_with_pandas = PythonOperator(
     dag=dag
 )
 
-start_operator >> conn_test >> run_etl_with_pandas
+def check_s3_connection_func():
+    #check_s3_access_key(bucket="put_your_bucket_name_here", prefix="put_your_folder_name_here")
+
+
+check_s3_connection = PythonOperator(
+    task_id="check_s3_connection",
+    python_callable=check_s3_connection_func,
+    dag=dag
+)
+
+"""
+run_etl_with_petl = PetlOperator(
+    task_id="run_etl_with_petl",
+    source_conn="mssql_conn",
+    source="select 1 as id",
+    dest_conn="s3_dev",
+    #dest_conn=Connection(host='/tmp/', conn_type='fs'),    
+    destination="tmp/output.avro",
+    dag=dag,
+    debug=True
+)
+"""
+
+start_operator >> conn_test >> check_s3_connection >> run_etl_with_pandas
+
+if __name__ == "__main__":
+    from helpers.airflow_utils import debug_dag
+
+    debug_dag(dag)
